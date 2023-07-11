@@ -1,6 +1,7 @@
 const userModel = require("../models/userModels")
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const hotelModel = require('../models/hotelModel')
 
 const signupController = async (req, res) => {
     try {
@@ -73,5 +74,35 @@ const authController = async (req,res) => {
     }
 }
 
+const bookHotelController = async (req,res) => {
+    try {
+        const newHotel = await hotelModel({...req.body, status: 'pending'})
+        await newHotel.save()
+        const adminUser = await userModel.findOne({isAdmin:true})
+        const notification = adminUser.notification || [];
+        notification.push({
+            type: 'hotel-booking-request',
+            message: `${newHotel.name} ${newHotel.petname} Has Booking for Cat Hotel`,
+            data: {
+                hotelId: newHotel._id,
+                name: newHotel.name + " " + newHotel.petname,
+                onClickPath: '/admin/dashboard/hotel',
+            }
+        })
+        await userModel.findOneAndUpdate({_id: adminUser._id} , {notification})
+        res.status(201).send({
+            success: true,
+            message: 'Cat Hotel Booking Successfully'
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({
+            success: false,
+            error,
+            message: 'Error Booking for Hotel'
+        })
+    }
+}
 
-module.exports = { loginController, signupController,authController}
+
+module.exports = { loginController, signupController,authController,bookHotelController}
