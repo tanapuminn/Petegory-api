@@ -82,7 +82,7 @@ const bookHotelController = async (req,res) => {
         const notification = adminUser.notification || [];
         notification.push({
             type: 'hotel-booking-request',
-            message: `${newHotel.name} ${newHotel.petname} Has Booking for Cat Hotel`,
+            message: `Name:${newHotel.name}\nPetname:${newHotel.petname}\nTyperoom: ${newHotel.room}\n Has Booking for Cat Hotel`,
             data: {
                 hotelId: newHotel._id,
                 name: newHotel.name + " " + newHotel.petname,
@@ -104,5 +104,51 @@ const bookHotelController = async (req,res) => {
     }
 }
 
+const getAllNotiController = async (req,res) => {
+    try {
+        const user = await userModel.findOne({_id: req.body.userId})
+        const seenotification = user.seenotification;
+        const notification = user.notification;
+        seenotification.push(...notification);
+        user.notification = [];
+        user.seenotification = notification;
+        const updatedUser = await user.save();
+        res.status(200).send({
+            success: true,
+            message: 'all notification marked as read',
+            data: updatedUser,
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({
+            message: 'Error in notification',
+            success: false,
+            error
+        })
+    }
+}
 
-module.exports = { loginController, signupController,authController,bookHotelController}
+const deleteAllNotiController = async (req,res) => {
+    try {
+        const user = await userModel.findOne({_id: req.body.userId})
+        user.notification = [];
+        user.seenotification = [];
+        const updatedUser = await user.save();
+        updatedUser.password = undefined;
+        res.status(200).send({
+            success: true,
+            message: 'Notifications Deleted Successfully',
+            data: updatedUser,
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({
+            success: false,
+            message: 'unable to delete all notifications',
+            error
+        })
+    }
+}
+
+
+module.exports = { loginController, signupController,authController,bookHotelController,getAllNotiController,deleteAllNotiController}
