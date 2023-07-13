@@ -32,14 +32,14 @@ const loginController = async (req, res) => {
         const user = await userModel.findOne({ email: req.body.email })
         if (!user) {
             return res
-            .status(200)
-            .send({ message: 'User Not Found', success: false })
+                .status(200)
+                .send({ message: 'User Not Found', success: false })
         }
         const isMatch = await bcrypt.compare(req.body.password, user.password)
         if (!isMatch) {
             return res
-            .status(200)
-            .send({ message: 'Invalid Email or Password', success: false })
+                .status(200)
+                .send({ message: 'Invalid Email or Password', success: false })
         }
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
         res.status(200).send({ message: 'Login Success', success: true, token })
@@ -49,11 +49,11 @@ const loginController = async (req, res) => {
     }
 }
 
-const authController = async (req,res) => {
+const authController = async (req, res) => {
     try {
-        const user = await userModel.findById({_id:req.body.userId});
+        const user = await userModel.findById({ _id: req.body.userId });
         user.password = undefined;
-        if(!user) {
+        if (!user) {
             return res.status(200).send({
                 message: 'user not found',
                 success: false
@@ -74,22 +74,56 @@ const authController = async (req,res) => {
     }
 }
 
-const bookHotelController = async (req,res) => {
+const bookHotelController = async (req, res) => {
     try {
-        const newHotel = await hotelModel({...req.body, status: 'pending'})
+        const newHotel = await hotelModel({ ...req.body, status: 'pending' })
         await newHotel.save()
-        const adminUser = await userModel.findOne({isAdmin:true})
-        const notification = adminUser.notification || [];
-        notification.push({
+        // const adminUser = await userModel.findOne({isAdmin: true})
+        // const notification = adminUser.notification || [];
+        // notification.push({
+        //     type: 'hotel-booking-request',
+        //     message: `New Booking for Cat Hotel\nName : ${newHotel.name}\nPetname : ${newHotel.petname}\nTyperoom : ${newHotel.room}\nTime : ${newHotel.time}`,
+        //     data: {
+        //         hotelId: newHotel._id,
+        //         name: newHotel.name + " " + newHotel.petname,
+        //         onClickPath: '/admin/dashboard/hotel',
+        //     }
+        // })
+        //send notification to admin and employee
+        const adminUser = await userModel.findOne({ isAdmin: true });
+        const employeeUser = await userModel.findOne({ isEmployee: true });
+
+        const notificationAdmin = {
             type: 'hotel-booking-request',
-            message: `Name:${newHotel.name}\nPetname:${newHotel.petname}\nTyperoom: ${newHotel.room}\n Has Booking for Cat Hotel`,
+            message: `New Booking for Cat Hotel\nName: ${newHotel.name}\nPetname: ${newHotel.petname}\nTyperoom: ${newHotel.room}\nTime: ${newHotel.time}`,
             data: {
                 hotelId: newHotel._id,
-                name: newHotel.name + " " + newHotel.petname,
+                name: newHotel.name + ' ' + newHotel.petname,
                 onClickPath: '/admin/dashboard/hotel',
-            }
-        })
-        await userModel.findOneAndUpdate({_id: adminUser._id} , {notification})
+            },
+        };
+
+        const notificationEmployee = {
+            type: 'hotel-booking-request',
+            message: `New Booking for Cat Hotel\nName: ${newHotel.name}\nPetname: ${newHotel.petname}\nTyperoom: ${newHotel.room}\nTime: ${newHotel.time}`,
+            data: {
+                hotelId: newHotel._id,
+                name: newHotel.name + ' ' + newHotel.petname,
+                onClickPath: '/employee/dashboard/hotel',
+            },
+        };
+
+        adminUser.notification.push(notificationAdmin);
+        employeeUser.notification.push(notificationEmployee);
+
+        await adminUser.save();
+        await employeeUser.save();
+        // await userModel.findOneAndUpdate({ _id: adminUser._id }, { notification })
+        //update notification
+        await userModel.findOneAndUpdate(
+            { _id: adminUser._id },
+            { $push: { notification: notificationAdmin } }
+          );
         res.status(201).send({
             success: true,
             message: 'Cat Hotel Booking Successfully'
@@ -104,9 +138,9 @@ const bookHotelController = async (req,res) => {
     }
 }
 
-const getAllNotiController = async (req,res) => {
+const getAllNotiController = async (req, res) => {
     try {
-        const user = await userModel.findOne({_id: req.body.userId})
+        const user = await userModel.findOne({ _id: req.body.userId })
         const seenotification = user.seenotification;
         const notification = user.notification;
         seenotification.push(...notification);
@@ -128,9 +162,9 @@ const getAllNotiController = async (req,res) => {
     }
 }
 
-const deleteAllNotiController = async (req,res) => {
+const deleteAllNotiController = async (req, res) => {
     try {
-        const user = await userModel.findOne({_id: req.body.userId})
+        const user = await userModel.findOne({ _id: req.body.userId })
         user.notification = [];
         user.seenotification = [];
         const updatedUser = await user.save();
@@ -151,4 +185,4 @@ const deleteAllNotiController = async (req,res) => {
 }
 
 
-module.exports = { loginController, signupController,authController,bookHotelController,getAllNotiController,deleteAllNotiController}
+module.exports = { loginController, signupController, authController, bookHotelController, getAllNotiController, deleteAllNotiController }

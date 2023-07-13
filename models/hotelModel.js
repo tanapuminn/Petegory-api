@@ -22,7 +22,7 @@ const hotelSchema = new mongoose.Schema({
     },
     time: {
         type: Object,
-        required: true
+        required: true,
     },
     status: {
         type: String,
