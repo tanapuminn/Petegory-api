@@ -20,6 +20,8 @@ app.use(bodyParser.json())
 
 app.use('/api/v1/user', require('./routes/userRoutes'))
 
+app.use('/api/v1/admin', require('./routes/adminRoutes'))
+
 app.listen(8080, () => {
     console.log('Backend is connected...')
 })
