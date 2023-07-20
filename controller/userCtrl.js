@@ -2,6 +2,9 @@ const userModel = require("../models/userModels")
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const hotelModel = require('../models/hotelModel')
+const hoteldetailModel = require('../models/hotelDetailModel')
+const moment = require('moment')
+
 
 const signupController = async (req, res) => {
     try {
@@ -12,7 +15,6 @@ const signupController = async (req, res) => {
         const password = await req.body.password;
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
-        // req.body.password = hashedPassword;
         const newUser = new userModel({
             name: req.body.name,
             email: req.body.email,
@@ -92,10 +94,18 @@ const bookHotelController = async (req, res) => {
         //send notification to admin and employee
         const adminUser = await userModel.findOne({ isAdmin: true });
         const employeeUser = await userModel.findOne({ isEmployee: true });
+        const formattedStartDate = moment(newHotel.startDate).format("DD/MM/YYYY");
+        const formattedEndDate = moment(newHotel.endDate).format("DD/MM/YYYY");
 
         const notificationAdmin = {
             type: 'hotel-booking-request',
-            message: `New Booking for Cat Hotel\nName: ${newHotel.name}\nPetname: ${newHotel.petname}\nTyperoom: ${newHotel.room}\nTime: ${newHotel.time}`,
+            message: 
+            `New Booking for Cat Hotel
+            Name: ${newHotel.name}
+            Petname: ${newHotel.petname}
+            Typeroom: ${newHotel.room}
+            Date: ${formattedStartDate} - ${formattedEndDate}
+            Time: ${newHotel.time}น.`,
             data: {
                 hotelId: newHotel._id,
                 name: newHotel.name + ' ' + newHotel.petname,
@@ -105,7 +115,13 @@ const bookHotelController = async (req, res) => {
 
         const notificationEmployee = {
             type: 'hotel-booking-request',
-            message: `New Booking for Cat Hotel\nName: ${newHotel.name}\nPetname: ${newHotel.petname}\nTyperoom: ${newHotel.room}\nTime: ${newHotel.time}`,
+            message: 
+            `New Booking for Cat Hotel
+            Name: ${newHotel.name}
+            Petname: ${newHotel.petname}
+            Typeroom: ${newHotel.room}
+            Date: ${formattedStartDate} - ${formattedEndDate}
+            Time: ${newHotel.time}น.`,
             data: {
                 hotelId: newHotel._id,
                 name: newHotel.name + ' ' + newHotel.petname,
@@ -113,7 +129,6 @@ const bookHotelController = async (req, res) => {
             },
         };
 
-        adminUser.notification.push(notificationAdmin);
         employeeUser.notification.push(notificationEmployee);
 
         await adminUser.save();
@@ -123,7 +138,7 @@ const bookHotelController = async (req, res) => {
         await userModel.findOneAndUpdate(
             { _id: adminUser._id },
             { $push: { notification: notificationAdmin } }
-          );
+        );
         res.status(201).send({
             success: true,
             message: 'Cat Hotel Booking Successfully'
@@ -184,5 +199,31 @@ const deleteAllNotiController = async (req, res) => {
     }
 }
 
+const getDetailHotelController = async (req, res) => {
+    try {
+        const detail = await hoteldetailModel.find({});
+        res.status(200).send({
+            success: true,
+            message: 'details data list',
+            data: detail,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: 'error while fetching details',
+            error,
+        });
+    }
+};
 
-module.exports = { loginController, signupController, authController, bookHotelController, getAllNotiController, deleteAllNotiController }
+
+module.exports = {
+    loginController,
+    signupController,
+    authController,
+    bookHotelController,
+    getAllNotiController,
+    deleteAllNotiController,
+    getDetailHotelController,
+}

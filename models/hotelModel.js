@@ -20,9 +20,17 @@ const hotelSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    startDate: {
+        type: Object,
+        required: true
+    },
+    endDate: {
+        type: Object,
+        required: true
+    },
     time: {
         type: Object,
-        required: true,
+        required: true
     },
     status: {
         type: String,
