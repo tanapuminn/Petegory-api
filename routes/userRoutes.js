@@ -6,7 +6,8 @@ const {
     bookHotelController, 
     getAllNotiController,
     deleteAllNotiController,
-    getDetailHotelController
+    getDetailHotelController,
+    deleteUserController,
 } = require('../controller/userCtrl');
 const auth = require('../middlewares/auth');
 
@@ -27,6 +28,7 @@ router.post('/deleteNotification', auth, deleteAllNotiController)
 
 //get detail hotels
 router.get('/getDetailHotel', getDetailHotelController)
+router.delete('/deleteUser/:id', auth, deleteUserController);
 
 
 module.exports = router;

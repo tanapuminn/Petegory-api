@@ -75,23 +75,54 @@ const authController = async (req, res) => {
         })
     }
 }
+const bookGroomingController = async (req,res) => {
+    try {
+        const newGrooming = await groomingModel({ ...req.body, status:'pending'})
+        await newGrooming.save()
+        const adminUser = await userModel.findOne({ isAdmin: true });
+        // const employeeUser = await userModel.findOne({ isEmployee: true });
+
+        const notificationAdmin = {
+            type:'grooming-booking-request',
+            message: 
+            `New Booking for Cat Hotel
+            Petname: ${newGrooming.petname}
+            Typepet: ${newGrooming.pettype}
+            number: ${newGrooming.number}
+            Date: ${newGrooming.date}
+            Add-on: ${newGrooming.addon}
+            Breed:${newGrooming.breed}
+            Time: ${newGrooming.time}น.`,
+            data: {
+                hotelId: newGrooming._id,
+                name: newGrooming.petname,
+                onClickPath: '/admin/dashboard/hotel',
+            },
+        }
+        await adminUser.save();
+        //update notification
+        await userModel.findOneAndUpdate(
+            { _id: adminUser._id },
+            { $push: { notification: notificationAdmin } }
+        );
+        res.status(201).send({
+            success: true,
+            message: ' Booking Grooming Successfully'
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).send({
+            success: false,
+            error,
+            message: 'Error Booking for Grooming'
+        })
+    }
+}
 
 const bookHotelController = async (req, res) => {
     try {
         const newHotel = await hotelModel({ ...req.body, status: 'pending' })
         await newHotel.save()
-        // const adminUser = await userModel.findOne({isAdmin: true})
-        // const notification = adminUser.notification || [];
-        // notification.push({
-        //     type: 'hotel-booking-request',
-        //     message: `New Booking for Cat Hotel\nName : ${newHotel.name}\nPetname : ${newHotel.petname}\nTyperoom : ${newHotel.room}\nTime : ${newHotel.time}`,
-        //     data: {
-        //         hotelId: newHotel._id,
-        //         name: newHotel.name + " " + newHotel.petname,
-        //         onClickPath: '/admin/dashboard/hotel',
-        //     }
-        // })
-        //send notification to admin and employee
         const adminUser = await userModel.findOne({ isAdmin: true });
         const employeeUser = await userModel.findOne({ isEmployee: true });
         const formattedStartDate = moment(newHotel.startDate).format("DD/MM/YYYY");
@@ -133,7 +164,6 @@ const bookHotelController = async (req, res) => {
 
         await adminUser.save();
         await employeeUser.save();
-        // await userModel.findOneAndUpdate({ _id: adminUser._id }, { notification })
         //update notification
         await userModel.findOneAndUpdate(
             { _id: adminUser._id },
@@ -217,6 +247,25 @@ const getDetailHotelController = async (req, res) => {
     }
 };
 
+const deleteUserController = async (req,res) => {
+    try {
+        const id = req.params.id;
+        const user = await userModel.findByIdAndDelete({ _id: id});
+        res.status(200).send({
+          success: true,
+          message: 'User deleted successfully',
+          data: user,
+        });
+      } catch (error) {
+        console.log(error);
+        res.status(500).send({
+          success: false,
+          message: 'Error deleting user',
+          error,
+        });
+      }
+}
+
 
 module.exports = {
     loginController,
@@ -226,4 +275,5 @@ module.exports = {
     getAllNotiController,
     deleteAllNotiController,
     getDetailHotelController,
+    deleteUserController,
 }
