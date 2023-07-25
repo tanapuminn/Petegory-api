@@ -5,6 +5,9 @@ const hotelModel = require('../models/hotelModel')
 const hoteldetailModel = require('../models/hotelDetailModel')
 const moment = require('moment')
 
+const { notifyLine } = require("../Functions/Notify")
+const tokenLine = '5Ir6hjUjIQ6374TGO91Fv1DA7ewZlh5UQodcI8DU65N'
+
 
 const signupController = async (req, res) => {
     try {
@@ -53,7 +56,7 @@ const loginController = async (req, res) => {
 
 const authController = async (req, res) => {
     try {
-        const user = await userModel.findById({ _id: req.body.userId });
+        const user = await userModel.findById({_id: req.body.userId});
         user.password = undefined;
         if (!user) {
             return res.status(200).send({
@@ -173,6 +176,11 @@ const bookHotelController = async (req, res) => {
             success: true,
             message: 'Cat Hotel Booking Successfully'
         })
+
+        //notify
+        const text = notificationAdmin.message
+        await notifyLine(tokenLine, text)
+
     } catch (error) {
         console.log(error)
         res.status(500).send({
@@ -249,8 +257,8 @@ const getDetailHotelController = async (req, res) => {
 
 const deleteUserController = async (req,res) => {
     try {
-        const id = req.params.id;
-        const user = await userModel.findByIdAndDelete({ _id: id});
+        const id = req.params.id
+        const user = await userModel.findByIdAndDelete({_id: id});
         res.status(200).send({
           success: true,
           message: 'User deleted successfully',
