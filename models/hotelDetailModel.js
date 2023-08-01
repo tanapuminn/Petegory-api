@@ -28,6 +28,10 @@ const hoteldetailSchema = new mongoose.Schema({
     title5: {
         type: String,
         required: true
+    },
+    image: {
+        type: String,
+        required: true
     }
 })
 
