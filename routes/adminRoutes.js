@@ -6,7 +6,8 @@ const {
     getAllUsersController, 
     getAllEmployeeController,
     createHotelController,
-    getHotelController
+    getHotelController,
+    getUserCountController
 } = require('../controller/adminCtrl')
 
 const router = express.Router();
@@ -31,6 +32,8 @@ router.get('/getAllEmployees', auth, getAllEmployeeController)
 router.post('/createHotels', auth, upload.single('filename'), createHotelController);
 
 router.get('/getHotels', auth, getHotelController)
+
+router.get('/getUserCount', auth, getUserCountController)
 
 
 module.exports = router;

@@ -81,5 +81,35 @@ const getHotelController = async (req, res) => {
     }
 };
 
+const getUserCountController = async (req,res) => {
+    try {
+        const count_data = [];
+        const userCount = await userModel.countDocuments({isAdmin: false})
 
-module.exports = {getAllUsersController, getAllEmployeeController,createHotelController,getHotelController}
+        count_data.push({
+            user:userCount,
+        })
+
+        res.status(200).send({
+            success: true,
+            message: 'users total list',
+            data: count_data,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: 'error while fetching details',
+            error,
+        });
+    }
+}
+
+
+module.exports = {
+    getAllUsersController, 
+    getAllEmployeeController,
+    createHotelController,
+    getHotelController,
+    getUserCountController,
+}
