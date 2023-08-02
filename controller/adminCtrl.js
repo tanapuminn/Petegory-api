@@ -82,18 +82,14 @@ const getHotelController = async (req, res) => {
 };
 
 const getUserCountController = async (req,res) => {
+    
     try {
-        const count_data = [];
-        const userCount = await userModel.countDocuments({isAdmin: false})
-
-        count_data.push({
-            user:userCount,
-        })
-
+        const userCount = await userModel.countDocuments()
+          
         res.status(200).send({
             success: true,
             message: 'users total list',
-            data: count_data,
+            data: userCount,
         });
     } catch (error) {
         console.log(error);
