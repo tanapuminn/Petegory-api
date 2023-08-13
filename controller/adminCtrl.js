@@ -1,5 +1,6 @@
 const userModel = require('../models/userModels')
 const hotelDetailModel = require('../models/hotelDetailModel')
+const employeeModel = require('../models/employeeModel')
 
 const getAllUsersController = async (req,res) => {
     try {
@@ -21,7 +22,7 @@ const getAllUsersController = async (req,res) => {
 
 const getAllEmployeeController = async (req,res) => {
     try {
-        const employees = await userModel.find({isAdmin: false, isEmployee: true})
+        const employees = await userModel.find({isEmployee: true})
         res.status(200).send({
             success: true,
             message: 'employees data list',
@@ -101,6 +102,35 @@ const getUserCountController = async (req,res) => {
     }
 }
 
+const changeStatusController = async (req, res) => {
+    try {
+      const { isEmployee } = req.body;
+      const employees = await userModel.findByIdAndUpdate(isEmployee);
+  
+      // ตรวจสอบว่าค่า role เป็น 'barber' เพื่อกำหนดค่า isEmployee เป็น true
+      if (employees.role === 'barber') {
+        employees.isEmployee = true;
+      }
+  
+      await employees.save();
+  
+      res.status(201).send({
+        success: true,
+        message: 'Account Status Updated',
+        data: employees,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+        success: false,
+        message: 'Error in Account Status',
+        error,
+      });
+    }
+  };
+  
+  
+
 
 module.exports = {
     getAllUsersController, 
@@ -108,4 +138,5 @@ module.exports = {
     createHotelController,
     getHotelController,
     getUserCountController,
+    changeStatusController
 }

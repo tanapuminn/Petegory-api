@@ -10,7 +10,7 @@ const employeeSchema = new mongoose.Schema({
         required: [true, 'email is require'],
     },
     phone: {
-        type: Number,
+        type: String,
         required: [true, 'phone is require']
     },
     password: {
@@ -19,7 +19,7 @@ const employeeSchema = new mongoose.Schema({
     },
     isEmployee: {
         type: Boolean,
-        default: false
+        default: true
     },
     notification: {
         type: Array,
@@ -31,5 +31,6 @@ const employeeSchema = new mongoose.Schema({
     }
 })
 
-const employeeModel = mongoose.model('users', employeeSchema)
+const employeeModel = mongoose.model('employees', employeeSchema)
+
 module.exports = employeeModel;
