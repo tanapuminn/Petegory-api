@@ -12,19 +12,19 @@ const groomingSchema = new mongoose.Schema({
         require: true
     },
     pettype:{
-        type:String,
+        type: String,
         require: true
     },
     addon:{
-        type:String,
+        type: String,
         require: true
     },
     breed:{
-        type:String,
+        type: String,
         require: true
     },
     date:{
-        type:Object,
+        type: Object,
         required:true,
 
     },

@@ -9,7 +9,9 @@ const {
     getDetailHotelController,
     deleteUserController,
     myBookingController,
-    changePasswordController
+    changePasswordController,
+    forgotPasswordController,
+    resetPasswordController
 } = require('../controller/userCtrl');
 const auth = require('../middlewares/auth');
 
@@ -34,8 +36,10 @@ router.get('/getDetailHotel', getDetailHotelController)
 router.delete('/deleteUser/:id', auth, deleteUserController);
 
 //get history booking
-router.get('/getMyBooking/:id', auth, myBookingController)
+router.get('/getMyBooking', auth, myBookingController)
 
 router.post('/changePassword',auth , changePasswordController)
+router.post('/forgotPassword', forgotPasswordController)
+router.post('/resetPassword/:id/:token', resetPasswordController)
 
 module.exports = router;
