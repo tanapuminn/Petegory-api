@@ -5,7 +5,7 @@ const hotelModel = require("../models/hotelModel");
 const hoteldetailModel = require("../models/hotelDetailModel");
 const employeeModel = require("../models/employeeModel");
 const moment = require("moment");
-const nodemailer = require('nodemailer')
+const nodemailer = require("nodemailer");
 
 const { notifyLine } = require("../Functions/Notify");
 const tokenLine = "5Ir6hjUjIQ6374TGO91Fv1DA7ewZlh5UQodcI8DU65N";
@@ -32,12 +32,10 @@ const signupController = async (req, res) => {
     res.status(201).send({ message: "Register Successfully", success: true });
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .send({
-        success: false,
-        message: `Register Controller ${error.message}`,
-      });
+    res.status(500).send({
+      success: false,
+      message: `Register Controller ${error.message}`,
+    });
   }
 };
 
@@ -135,7 +133,11 @@ const bookGroomingController = async (req, res) => {
 const bookHotelController = async (req, res) => {
   try {
     const userId = req.body._id;
-    const newHotel = await hotelModel({ ...req.body, userId, status: "pending" });
+    const newHotel = await hotelModel({
+      ...req.body,
+      userId,
+      status: "pending",
+    });
     await newHotel.save();
     const adminUser = await userModel.findOne({ isAdmin: true });
     const employeeUser = await userModel.findOne({ isEmployee: true });
@@ -263,29 +265,10 @@ const getDetailHotelController = async (req, res) => {
   }
 };
 
-const deleteUserController = async (req, res) => {
-  try {
-    const id = req.params.id;
-    const user = await userModel.findByIdAndDelete({ _id: id });
-    res.status(200).send({
-      success: true,
-      message: "User deleted successfully",
-      data: user,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send({
-      success: false,
-      message: "Error deleting user",
-      error,
-    });
-  }
-};
-
 const myBookingController = async (req, res) => {
   try {
     const userId = req.body._id;
-    const user = await hotelModel.find(userId)
+    const user = await hotelModel.find(userId);
     res.status(200).send({
       success: true,
       message: "details booking list",
@@ -327,73 +310,115 @@ const changePasswordController = async (req, res) => {
   }
 };
 
-const forgotPasswordController = async (req,res) => {
-    const {email} = req.body;
-      await userModel.findOne({email})
-      .then(user => {
-        if(!user) {
-            return res.send({message: "User not existed"})
-        } 
-        const token = jwt.sign({id: user._id}, "jwt_secret_key", {expiresIn: "1d"})
-        var transporter = nodemailer.createTransport({
-            service: 'gmail',
-            secure: true,
-            auth: {
-              user: 'tanapumin.fo@gmail.com',
-              pass: 'umvsulynvqfehyde'
-            }
-          });
-          
-          var mailOptions = {
-            from: 'tanapumin.fo@gmail.com',
-            to: email,
-            subject: 'Reset Password Link',
-            text: `http://localhost:3000/reset-password/${user._id}/${token}`
-          };
-          
-          transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-              console.log("Email send error:", error);
-            } else {
-              console.log("Email sent:", info.response);
-              return res.send({success: true})
-            }
-          });
-          return res.send({success: true});
+const forgotPasswordController = async (req, res) => {
+  const { email } = req.body;
+  await userModel
+    .findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return res.send({ message: "User not existed" });
+      }
+      const token = jwt.sign({ id: user._id }, "jwt_secret_key", {
+        expiresIn: "1d",
+      });
+      var transporter = nodemailer.createTransport({
+        service: "gmail",
+        secure: true,
+        auth: {
+          user: "tanapumin.fo@gmail.com",
+          pass: "umvsulynvqfehyde",
+        },
+      });
+
+      var mailOptions = {
+        from: "tanapumin.fo@gmail.com",
+        to: email,
+        subject: "Reset Password Link",
+        text: `http://localhost:3000/reset-password/${user._id}/${token}`,
+      };
+
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log("Email send error:", error);
+        } else {
+          console.log("Email sent:", info.response);
+          return res.send({ success: true });
+        }
+      });
+      return res.send({ success: true });
     })
-    .catch(error => {
+    .catch((error) => {
       console.log(error);
-      return res.send({message: "An error occurred"});
+      return res.send({ message: "An error occurred" });
     });
-}
+};
 
-const resetPasswordController = (req,res) => {
-  const {id, token} = req.params
-  const {password} = req.body
+const resetPasswordController = (req, res) => {
+  const { id, token } = req.params;
+  const { password } = req.body;
 
-  jwt.verify(token, 'jwt_secret_key', (err, decode) => {
-    if(err) {
+  jwt.verify(token, "jwt_secret_key", (err, decode) => {
+    if (err) {
       return res.send({
         success: false,
-        message: 'Error with token'
-      })
+        message: "Error with token",
+      });
     } else {
-       bcrypt.hash(password, 10)
-      .then(hash => {
-        userModel.findByIdAndUpdate({_id: id}, {password: hash})
-        .then(u => res.send({success: true}))
-        .catch(err => res.send({
-          success: false,
-          message: 'Hash Error'
-        }
-        ))
-      })
-      .catch(err => res.send({
-        success: false,
-        message: 'Error to hash reset'
-      }))
+      bcrypt
+        .hash(password, 10)
+        .then((hash) => {
+          userModel
+            .findByIdAndUpdate({ _id: id }, { password: hash })
+            .then((u) => res.send({ success: true }))
+            .catch((err) =>
+              res.send({
+                success: false,
+                message: "Hash Error",
+              })
+            );
+        })
+        .catch((err) =>
+          res.send({
+            success: false,
+            message: "Error to hash reset",
+          })
+        );
     }
-  })
+  });
+};
+
+const getUserProfileController = async (req, res) => {
+  try {
+    const user = await userModel.findById({_id: req.body.userId})
+    res.status(200).send({
+      success: true,
+      message: "get user detail",
+      data: user,
+    });
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({ 
+      success: false, 
+      message: 'get user error' });
+  }
+}
+
+const userEditController = async (req, res) => {
+  const {name, email, phone} = req.body;
+  try {
+    const user = await userModel.findOneAndUpdate({_id: req.body.userId}, {name, email, phone})
+    res.status(200).send({
+      success: true,
+      message: "updated success",
+      data: user,
+    });
+  } catch (error) {
+    console.log(error)
+    res.send({
+      success: false,
+      message: "Error to updated",
+    })
+  }
 }
 
 
@@ -405,9 +430,10 @@ module.exports = {
   getAllNotiController,
   deleteAllNotiController,
   getDetailHotelController,
-  deleteUserController,
   myBookingController,
   changePasswordController,
   forgotPasswordController,
-  resetPasswordController
+  resetPasswordController,
+  getUserProfileController,
+  userEditController,
 };

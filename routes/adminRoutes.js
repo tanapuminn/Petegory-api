@@ -8,7 +8,10 @@ const {
     createHotelController,
     getHotelController,
     getUserCountController,
-    changeStatusController
+    changeStatusController,
+    editUserController,
+    updateUserController,
+    deleteUserController,
 } = require('../controller/adminCtrl')
 
 const router = express.Router();
@@ -37,6 +40,10 @@ router.get('/getHotels', auth, getHotelController)
 router.get('/getUserCount', auth, getUserCountController)
 
 router.post('/changeStatus', auth, changeStatusController)
+
+router.get('/editUser/:id', auth, editUserController)
+router.put('/updateUser/:id', auth, updateUserController)
+router.delete('/deleteUser/:id', auth, deleteUserController);
 
 
 module.exports = router;
