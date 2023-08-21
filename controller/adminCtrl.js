@@ -196,6 +196,55 @@ const deleteUserController = async (req, res) => {
     }
   };
 
+const editEmployeeController = async (req,res) => {
+  try {
+    const id = req.params.id;
+
+    const user = await userModel.findById({ _id: id });
+
+    if (user) {
+      res.status(200).send({
+        success: true,
+        message: "Employee data get successfully",
+        data: user,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error get Employee data",
+    });
+  }
+}
+
+const updateEmployeeController = async (req,res) => {
+  try {
+    const id = req.params.id;
+    const { name, email, phone, role } = req.body;
+    const updateUser = await userModel.findByIdAndUpdate(
+      { _id: id },
+      { name, email, phone, role }
+    );
+    res.status(200).send({
+        success: true,
+        message: "Update Employee successfully",
+        data: updateUser,
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error updating Employee data",
+    });
+  }
+}
+
 module.exports = {
   getAllUsersController,
   getAllEmployeeController,
@@ -206,4 +255,6 @@ module.exports = {
   editUserController,
   updateUserController,
   deleteUserController,
+  editEmployeeController,
+  updateEmployeeController,
 };

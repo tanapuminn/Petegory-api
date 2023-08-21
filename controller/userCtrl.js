@@ -133,9 +133,25 @@ const bookGroomingController = async (req, res) => {
 const bookHotelController = async (req, res) => {
   try {
     const userId = req.body._id;
+    /// เช็คเวลา
+    const existingBooking = await hotelModel.findOne({
+      room: req.body.room,
+      startDate: req.body.startDate,
+      endDate: req.body.endDate,
+      time: req.body.time,
+    });
+    
+    if (existingBooking) {
+      return res.status(400).send({
+        success: false,
+        message: "This time slot is already booked.",
+      });
+    }
+    ///
     const newHotel = await hotelModel({
       ...req.body,
       userId,
+      existingBooking,
       status: "pending",
     });
     await newHotel.save();
@@ -193,6 +209,14 @@ const bookHotelController = async (req, res) => {
     await notifyLine(tokenLine, text);
   } catch (error) {
     console.log(error);
+    //
+    if (error.code === 11000) {
+      return res.status(400).send({
+        success: false,
+        message: "This time slot is already booked.",
+      });
+    }
+    //
     res.status(500).send({
       success: false,
       error,

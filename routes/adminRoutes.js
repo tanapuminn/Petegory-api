@@ -12,6 +12,8 @@ const {
     editUserController,
     updateUserController,
     deleteUserController,
+    editEmployeeController,
+    updateEmployeeController,
 } = require('../controller/adminCtrl')
 
 const router = express.Router();
@@ -44,6 +46,9 @@ router.post('/changeStatus', auth, changeStatusController)
 router.get('/editUser/:id', auth, editUserController)
 router.put('/updateUser/:id', auth, updateUserController)
 router.delete('/deleteUser/:id', auth, deleteUserController);
+
+router.get('/editEmployee/:id', auth, editEmployeeController)
+router.put('/updateEmployee/:id', auth, updateEmployeeController)
 
 
 module.exports = router;
