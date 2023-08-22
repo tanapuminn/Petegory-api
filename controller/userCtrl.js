@@ -136,8 +136,21 @@ const bookHotelController = async (req, res) => {
     /// เช็คเวลา
     const existingBooking = await hotelModel.findOne({
       room: req.body.room,
-      startDate: req.body.startDate,
-      endDate: req.body.endDate,
+      //เงื่อนไขเช็คเวลาระหว่าง startDate & endDate
+      $or: [
+        {
+          $and: [
+            { startDate: { $lte: req.body.startDate } }, //หาวันที่น้อยกว่าหรือเท่ากับ startDate
+            { endDate: { $gte: req.body.startDate } }, //หาวันที่มากกว่าหรือเท่ากับ startDate
+          ],
+        },
+        {
+          $and: [
+            { startDate: { $lte: req.body.endDate } }, //หาวันที่น้อยกว่าหรือเท่ากับ endDate
+            { endDate: { $gte: req.body.endDate } }, //หาวันที่มากกว่าหรือเท่ากับ endDate
+          ],
+        },
+      ],
       time: req.body.time,
     });
     
@@ -157,8 +170,8 @@ const bookHotelController = async (req, res) => {
     await newHotel.save();
     const adminUser = await userModel.findOne({ isAdmin: true });
     const employeeUser = await userModel.findOne({ isEmployee: true });
-    const formattedStartDate = moment(newHotel.startDate).format("DD/MM/YYYY");
-    const formattedEndDate = moment(newHotel.endDate).format("DD/MM/YYYY");
+    // const formattedStartDate = moment(newHotel.startDate).format("DD/MM/YYYY");
+    // const formattedEndDate = moment(newHotel.endDate).format("DD/MM/YYYY");
 
     const notificationAdmin = {
       type: "hotel-booking-request",
@@ -166,7 +179,7 @@ const bookHotelController = async (req, res) => {
             Name: ${newHotel.name}
             Petname: ${newHotel.petname}
             Typeroom: ${newHotel.room}
-            Date: ${formattedStartDate} - ${formattedEndDate}
+            Date: ${newHotel.startDate} - ${newHotel.endDate}
             Time: ${newHotel.time}น.`,
       data: {
         hotelId: newHotel._id,
@@ -181,7 +194,7 @@ const bookHotelController = async (req, res) => {
             Name: ${newHotel.name}
             Petname: ${newHotel.petname}
             Typeroom: ${newHotel.room}
-            Date: ${formattedStartDate} - ${formattedEndDate}
+            Date: ${newHotel.startDate} - ${newHotel.endDate}
             Time: ${newHotel.time}น.`,
       data: {
         hotelId: newHotel._id,
@@ -207,6 +220,7 @@ const bookHotelController = async (req, res) => {
     //notify
     const text = notificationAdmin.message;
     await notifyLine(tokenLine, text);
+
   } catch (error) {
     console.log(error);
     //
