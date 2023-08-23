@@ -13,6 +13,7 @@ const {
     resetPasswordController,
     userEditController,
     getUserProfileController,
+    isRoomBookedController
 } = require('../controller/userCtrl');
 const auth = require('../middlewares/auth');
 
@@ -26,6 +27,7 @@ router.post('/signup', signupController)
 
 router.post('/getUserData', auth, authController)
 
+router.get('/isRoomBooked', auth, isRoomBookedController)
 router.post('/bookHotel', auth, bookHotelController)
 
 //Notification Hotel

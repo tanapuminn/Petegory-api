@@ -17,7 +17,11 @@ const hotelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    room: {
+    roomType: {
+      type: String,
+      required: true,
+    },
+    roomNumber: {
       type: String,
       required: true,
     },
@@ -29,13 +33,10 @@ const hotelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    date: {
-      type: String,
-    },
-    time: {
-      type: Object,
-      required: true,
-    },
+    // time: {
+    //   type: Object,
+    //   required: true,
+    // },
     status: {
       type: String,
       default: "pending",

@@ -130,41 +130,59 @@ const bookGroomingController = async (req, res) => {
   }
 };
 
-const bookHotelController = async (req, res) => {
+const isRoomBooked = async (roomType, roomNumber, startDate, endDate) => {
   try {
-    const userId = req.body._id;
-    /// เช็คเวลา
     const existingBooking = await hotelModel.findOne({
-      room: req.body.room,
-      //เงื่อนไขเช็คเวลาระหว่าง startDate & endDate
       $or: [
         {
           $and: [
-            { startDate: { $lte: req.body.startDate } }, //หาวันที่น้อยกว่าหรือเท่ากับ startDate
-            { endDate: { $gte: req.body.startDate } }, //หาวันที่มากกว่าหรือเท่ากับ startDate
+            { startDate: { $lte: startDate } },
+            { endDate: { $gte: startDate } },
           ],
         },
         {
           $and: [
-            { startDate: { $lte: req.body.endDate } }, //หาวันที่น้อยกว่าหรือเท่ากับ endDate
-            { endDate: { $gte: req.body.endDate } }, //หาวันที่มากกว่าหรือเท่ากับ endDate
+            { startDate: { $lte: endDate } },
+            { endDate: { $gte: endDate } },
           ],
         },
       ],
-      time: req.body.time,
+      roomType,
+      roomNumber,
     });
+    return !!existingBooking;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+const isRoomBookedController = async (req, res) => {
+  const { roomType, roomNumber, startDate, endDate } = req.query;
+
+  try {
+    const isBooked = await isRoomBooked(roomType, roomNumber, startDate, endDate);
+    res.status(200).json({ isBooked });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred" });
+  }
+};
+
+const bookHotelController = async (req, res) => {
+  try {
+    const userId = req.body._id;
     
-    if (existingBooking) {
+    if (await isRoomBooked(req.body.roomType, req.body.roomNumber, req.body.startDate, req.body.endDate)) {
       return res.status(400).send({
         success: false,
-        message: "This time slot is already booked.",
+        message: "This room is already booked.",
       });
     }
     ///
     const newHotel = await hotelModel({
       ...req.body,
       userId,
-      existingBooking,
       status: "pending",
     });
     await newHotel.save();
@@ -178,9 +196,10 @@ const bookHotelController = async (req, res) => {
       message: `New Booking for Cat Hotel
             Name: ${newHotel.name}
             Petname: ${newHotel.petname}
-            Typeroom: ${newHotel.room}
+            Room type: ${newHotel.roomType}
+            Room number: ${newHotel.roomNumber}
             Date: ${newHotel.startDate} - ${newHotel.endDate}
-            Time: ${newHotel.time}น.`,
+            `,
       data: {
         hotelId: newHotel._id,
         name: newHotel.name + " " + newHotel.petname,
@@ -193,9 +212,10 @@ const bookHotelController = async (req, res) => {
       message: `New Booking for Cat Hotel
             Name: ${newHotel.name}
             Petname: ${newHotel.petname}
-            Typeroom: ${newHotel.room}
+            Room type: ${newHotel.roomType}
+            Room number: ${newHotel.roomNumber}
             Date: ${newHotel.startDate} - ${newHotel.endDate}
-            Time: ${newHotel.time}น.`,
+            `,
       data: {
         hotelId: newHotel._id,
         name: newHotel.name + " " + newHotel.petname,
@@ -227,7 +247,7 @@ const bookHotelController = async (req, res) => {
     if (error.code === 11000) {
       return res.status(400).send({
         success: false,
-        message: "This time slot is already booked.",
+        message: "This room is already booked.",
       });
     }
     //
@@ -474,4 +494,6 @@ module.exports = {
   resetPasswordController,
   getUserProfileController,
   userEditController,
+  isRoomBooked,
+  isRoomBookedController
 };
