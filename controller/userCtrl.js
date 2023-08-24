@@ -56,6 +56,7 @@ const loginController = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
+
     res.status(200).send({ message: "Login Success", success: true, token });
   } catch (error) {
     console.log(error);
@@ -87,6 +88,7 @@ const authController = async (req, res) => {
     });
   }
 };
+
 const bookGroomingController = async (req, res) => {
   try {
     const newGrooming = await groomingModel({ ...req.body, status: "pending" });
@@ -171,7 +173,7 @@ const isRoomBookedController = async (req, res) => {
 
 const bookHotelController = async (req, res) => {
   try {
-    const userId = req.body._id;
+    const userId = req.body.userId;
     
     if (await isRoomBooked(req.body.roomType, req.body.roomNumber, req.body.startDate, req.body.endDate)) {
       return res.status(400).send({
@@ -182,7 +184,7 @@ const bookHotelController = async (req, res) => {
     ///
     const newHotel = await hotelModel({
       ...req.body,
-      userId,
+      userId: userId,
       status: "pending",
     });
     await newHotel.save();
@@ -325,18 +327,43 @@ const getDetailHotelController = async (req, res) => {
 
 const myBookingController = async (req, res) => {
   try {
-    const userId = req.body._id;
-    const user = await hotelModel.find(userId);
+    const loggedInUserId = req.body.userId;
+    const userBookings = await hotelModel.find({ userId: loggedInUserId });
     res.status(200).send({
       success: true,
       message: "details booking list",
-      data: user,
+      data: userBookings,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
       message: "error while fetching details",
+      error,
+    });
+  }
+};
+
+const deleteBookingHotelController = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const deletedBooking  = await hotelModel.findByIdAndDelete({ _id: id });
+    if (!deletedBooking) {
+      return res.status(404).send({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+    res.status(200).send({
+      success: true,
+      message: "Booking deleted successfully",
+      data: deletedBooking ,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error deleting booking",
       error,
     });
   }
@@ -495,5 +522,6 @@ module.exports = {
   getUserProfileController,
   userEditController,
   isRoomBooked,
-  isRoomBookedController
+  isRoomBookedController,
+  deleteBookingHotelController
 };

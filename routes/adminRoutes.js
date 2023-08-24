@@ -14,6 +14,7 @@ const {
     deleteUserController,
     editEmployeeController,
     updateEmployeeController,
+    getAllbookingHotelsController,
 } = require('../controller/adminCtrl')
 
 const router = express.Router();
@@ -49,6 +50,8 @@ router.delete('/deleteUser/:id', auth, deleteUserController);
 
 router.get('/editEmployee/:id', auth, editEmployeeController)
 router.put('/updateEmployee/:id', auth, updateEmployeeController)
+
+router.get('/allBookedHotel', auth, getAllbookingHotelsController)
 
 
 module.exports = router;

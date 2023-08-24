@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 const hotelSchema = new mongoose.Schema(
   {
     userId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "users", // ระบุชื่อโมเดลผู้ใช้
+      required: true
     },
     name: {
       type: String,
@@ -33,10 +35,6 @@ const hotelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // time: {
-    //   type: Object,
-    //   required: true,
-    // },
     status: {
       type: String,
       default: "pending",

@@ -1,6 +1,7 @@
 const userModel = require("../models/userModels");
 const hotelDetailModel = require("../models/hotelDetailModel");
 const employeeModel = require("../models/employeeModel");
+const hotelModel = require("../models/hotelModel")
 
 const getAllUsersController = async (req, res) => {
   try {
@@ -244,6 +245,23 @@ const updateEmployeeController = async (req,res) => {
     });
   }
 }
+const getAllbookingHotelsController = async (req,res) => {
+  try {
+    const user = await hotelModel.find();
+    res.status(200).send({
+      success: true,
+      message: "all details booking list",
+      data: user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "error while fetching details",
+      error,
+    });
+  }
+}
 
 module.exports = {
   getAllUsersController,
@@ -257,4 +275,5 @@ module.exports = {
   deleteUserController,
   editEmployeeController,
   updateEmployeeController,
+  getAllbookingHotelsController
 };
