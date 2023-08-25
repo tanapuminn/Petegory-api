@@ -3,7 +3,8 @@ const {
     loginController, 
     signupController,
     authController, 
-    bookHotelController, 
+    bookHotelController,
+    bookGroomingController, 
     getAllNotiController,
     deleteAllNotiController,
     getDetailHotelController,
@@ -28,8 +29,12 @@ router.post('/signup', signupController)
 
 router.post('/getUserData', auth, authController)
 
+//Booking Hotel
 router.get('/isRoomBooked', auth, isRoomBookedController)
 router.post('/bookHotel', auth, bookHotelController)
+
+//Booking Grooming
+router.post('/bookGrooming', auth, bookGroomingController)
 
 //Notification Hotel
 router.post('/getNotification', auth, getAllNotiController)

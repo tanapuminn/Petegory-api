@@ -1,7 +1,8 @@
 const userModel = require("../models/userModels");
 const hotelDetailModel = require("../models/hotelDetailModel");
 const employeeModel = require("../models/employeeModel");
-const hotelModel = require("../models/hotelModel")
+const hotelModel = require("../models/hotelModel");
+const groomingModel = require('../models/groomingModel')
 
 const getAllUsersController = async (req, res) => {
   try {
@@ -85,7 +86,7 @@ const getHotelController = async (req, res) => {
 
 const getUserCountController = async (req, res) => {
   try {
-    const userCount = await userModel.countDocuments();
+    const userCount = await userModel.findOne({isEmployee:false , isAdmin: false}).countDocuments();
 
     res.status(200).send({
       success: true,
@@ -101,6 +102,44 @@ const getUserCountController = async (req, res) => {
     });
   }
 };
+
+const getBookHotelCountController = async (req,res) => {
+  try {
+    const BookingHotelCount = await hotelModel.countDocuments();
+
+    res.status(200).send({
+      success: true,
+      message: "Hotel Booking total list",
+      data: BookingHotelCount,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "error while fetching details",
+      error,
+    });
+  }
+}
+
+const getBookGroomingCountController = async (req,res) => {
+  try {
+    const BookingGroomingCount = await groomingModel.countDocuments();
+
+    res.status(200).send({
+      success: true,
+      message: "Grooming Booking total list",
+      data: BookingGroomingCount,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "error while fetching details",
+      error,
+    });
+  }
+}
 
 const changeStatusController = async (req, res) => {
   try {
@@ -124,6 +163,31 @@ const changeStatusController = async (req, res) => {
     res.status(500).send({
       success: false,
       message: "Error in Account Status",
+      error,
+    });
+  }
+};
+const statusBookHotelController = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const bookHotel = await hotelModel.findByIdAndUpdate(status);
+
+    if (bookHotel.status === "pending") {
+      bookHotel.status = 'success';
+    }
+
+    await bookHotel.save();
+
+    res.status(201).send({
+      success: true,
+      message: "Status is Updated",
+      data: bookHotel,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in Update Status",
       error,
     });
   }
@@ -165,10 +229,10 @@ const updateUserController = async (req, res) => {
       { name, email, phone }
     );
     res.status(200).send({
-        success: true,
-        message: "Update user successfully",
-        data: updateUser,
-      });
+      success: true,
+      message: "Update user successfully",
+      data: updateUser,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -179,25 +243,25 @@ const updateUserController = async (req, res) => {
 };
 
 const deleteUserController = async (req, res) => {
-    try {
-      const id = req.params.id;
-      const user = await userModel.findByIdAndDelete({ _id: id });
-      res.status(200).send({
-        success: true,
-        message: "User deleted successfully",
-        data: user,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).send({
-        success: false,
-        message: "Error deleting user",
-        error,
-      });
-    }
-  };
+  try {
+    const id = req.params.id;
+    const user = await userModel.findByIdAndDelete({ _id: id });
+    res.status(200).send({
+      success: true,
+      message: "User deleted successfully",
+      data: user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error deleting user",
+      error,
+    });
+  }
+};
 
-const editEmployeeController = async (req,res) => {
+const editEmployeeController = async (req, res) => {
   try {
     const id = req.params.id;
 
@@ -222,9 +286,9 @@ const editEmployeeController = async (req,res) => {
       message: "Error get Employee data",
     });
   }
-}
+};
 
-const updateEmployeeController = async (req,res) => {
+const updateEmployeeController = async (req, res) => {
   try {
     const id = req.params.id;
     const { name, email, phone, role } = req.body;
@@ -233,10 +297,10 @@ const updateEmployeeController = async (req,res) => {
       { name, email, phone, role }
     );
     res.status(200).send({
-        success: true,
-        message: "Update Employee successfully",
-        data: updateUser,
-      });
+      success: true,
+      message: "Update Employee successfully",
+      data: updateUser,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -244,8 +308,8 @@ const updateEmployeeController = async (req,res) => {
       message: "Error updating Employee data",
     });
   }
-}
-const getAllbookingHotelsController = async (req,res) => {
+};
+const getAllbookingHotelsController = async (req, res) => {
   try {
     const user = await hotelModel.find();
     res.status(200).send({
@@ -261,19 +325,134 @@ const getAllbookingHotelsController = async (req,res) => {
       error,
     });
   }
+};
+
+const editBookHotelController = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    // const user = {userId}
+
+    const user = await hotelModel.findOne(
+      { _id: userId },
+      { userId: 1, _id: 0, name: 1, petname: 1 }
+    );
+
+    if (user) {
+      res.status(200).send({
+        success: true,
+        message: "User Booked get successfully",
+        data: user,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: "User Booked not found",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error get User Booked",
+    });
+  }
+};
+
+const updateBookHotelController = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { name, petname, startDate, endDate, time } = req.body;
+    const updateUser = await hotelModel.findByIdAndUpdate(
+      { _id: id },
+      { name, petname, startDate, endDate, time }
+    );
+    res.status(200).send({
+      success: true,
+      message: "Update User Booked successfully",
+      data: updateUser,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error updating User Booked",
+    });
+  }
+};
+
+const deleteBookHotelController = async (req,res) => {
+  try {
+    const userId = req.params.id;
+    const user = await hotelModel.findByIdAndDelete({ _id: userId });
+    res.status(200).send({
+      success: true,
+      message: "Booked Hotel deleted successfully",
+      data: user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error deleting Booked Hotel",
+      error,
+    });
+  }
 }
 
+const getAllbookingGroomingController = async (req, res) => {
+  try {
+    const user = await groomingModel.find();
+    res.status(200).send({
+      success: true,
+      message: "all details booking list",
+      data: user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "error while fetching details",
+      error,
+    });
+  }
+};
+const deleteBookedGroomingController = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await groomingModel.findByIdAndDelete({ _id: userId });
+    res.status(200).send({
+      success: true,
+      message: "Booked Grooming deleted successfully",
+      data: user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error deleting Booked Grooming",
+      error,
+    });
+  }
+};
 module.exports = {
   getAllUsersController,
   getAllEmployeeController,
   createHotelController,
   getHotelController,
   getUserCountController,
+  getBookHotelCountController,
+  getBookGroomingCountController,
   changeStatusController,
+  statusBookHotelController,
   editUserController,
   updateUserController,
   deleteUserController,
   editEmployeeController,
   updateEmployeeController,
-  getAllbookingHotelsController
+  getAllbookingHotelsController,
+  editBookHotelController,
+  updateBookHotelController,
+  deleteBookHotelController,
+  getAllbookingGroomingController,
+  deleteBookedGroomingController,
 };

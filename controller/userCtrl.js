@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const hotelModel = require("../models/hotelModel");
 const hoteldetailModel = require("../models/hotelDetailModel");
+const groomingModel = require("../models/groomingModel");
 const employeeModel = require("../models/employeeModel");
 const moment = require("moment");
 const nodemailer = require("nodemailer");
@@ -91,33 +92,38 @@ const authController = async (req, res) => {
 
 const bookGroomingController = async (req, res) => {
   try {
-    const newGrooming = await groomingModel({ ...req.body, status: "pending" });
+    const userId = req.body.userId;
+    const newGrooming = await groomingModel({
+      ...req.body,
+      userId: userId,
+      status: "pending",
+    });
     await newGrooming.save();
-    const adminUser = await userModel.findOne({ isAdmin: true });
+    // const adminUser = await userModel.findOne({ isAdmin: true });
     // const employeeUser = await userModel.findOne({ isEmployee: true });
 
-    const notificationAdmin = {
-      type: "grooming-booking-request",
-      message: `New Booking for Cat Hotel
-            Petname: ${newGrooming.petname}
-            Typepet: ${newGrooming.pettype}
-            number: ${newGrooming.number}
-            Date: ${newGrooming.date}
-            Add-on: ${newGrooming.addon}
-            Breed:${newGrooming.breed}
-            Time: ${newGrooming.time}น.`,
-      data: {
-        hotelId: newGrooming._id,
-        name: newGrooming.petname,
-        onClickPath: "/admin/dashboard/hotel",
-      },
-    };
-    await adminUser.save();
-    //update notification
-    await userModel.findOneAndUpdate(
-      { _id: adminUser._id },
-      { $push: { notification: notificationAdmin } }
-    );
+    // const notificationAdmin = {
+    //   type: "grooming-booking-request",
+    //   message: `New Booking for Cat Hotel
+    //         Petname: ${newGrooming.petname}
+    //         Typepet: ${newGrooming.pettype}
+    //         number: ${newGrooming.number}
+    //         Date: ${newGrooming.date}
+    //         Add-on: ${newGrooming.addon}
+    //         Breed:${newGrooming.breed}
+    //         Time: ${newGrooming.time}น.`,
+    //   data: {
+    //     hotelId: newGrooming._id,
+    //     name: newGrooming.petname,
+    //     onClickPath: "/admin/dashboard/grooming",
+    //   },
+    // };
+    // await adminUser.save();
+    // //update notification
+    // await userModel.findOneAndUpdate(
+    //   { _id: adminUser._id },
+    //   { $push: { notification: notificationAdmin } }
+    // );
     res.status(201).send({
       success: true,
       message: " Booking Grooming Successfully",
@@ -163,7 +169,12 @@ const isRoomBookedController = async (req, res) => {
   const { roomType, roomNumber, startDate, endDate } = req.query;
 
   try {
-    const isBooked = await isRoomBooked(roomType, roomNumber, startDate, endDate);
+    const isBooked = await isRoomBooked(
+      roomType,
+      roomNumber,
+      startDate,
+      endDate
+    );
     res.status(200).json({ isBooked });
   } catch (error) {
     console.error(error);
@@ -174,8 +185,15 @@ const isRoomBookedController = async (req, res) => {
 const bookHotelController = async (req, res) => {
   try {
     const userId = req.body.userId;
-    
-    if (await isRoomBooked(req.body.roomType, req.body.roomNumber, req.body.startDate, req.body.endDate)) {
+
+    if (
+      await isRoomBooked(
+        req.body.roomType,
+        req.body.roomNumber,
+        req.body.startDate,
+        req.body.endDate
+      )
+    ) {
       return res.status(400).send({
         success: false,
         message: "This room is already booked.",
@@ -190,17 +208,17 @@ const bookHotelController = async (req, res) => {
     await newHotel.save();
     const adminUser = await userModel.findOne({ isAdmin: true });
     const employeeUser = await userModel.findOne({ isEmployee: true });
-    // const formattedStartDate = moment(newHotel.startDate).format("DD/MM/YYYY");
-    // const formattedEndDate = moment(newHotel.endDate).format("DD/MM/YYYY");
+    const formatTime = moment(newHotel.time).format("HH:mm");
 
     const notificationAdmin = {
       type: "hotel-booking-request",
-      message: `New Booking for Cat Hotel
+      message: `มีการจองโรงแรมแมว
             Name: ${newHotel.name}
             Petname: ${newHotel.petname}
             Room type: ${newHotel.roomType}
             Room number: ${newHotel.roomNumber}
             Date: ${newHotel.startDate} - ${newHotel.endDate}
+            Check-in Time: ${formatTime}
             `,
       data: {
         hotelId: newHotel._id,
@@ -211,12 +229,13 @@ const bookHotelController = async (req, res) => {
 
     const notificationEmployee = {
       type: "hotel-booking-request",
-      message: `New Booking for Cat Hotel
+      message: `มีการจองโรงแรมแมว
             Name: ${newHotel.name}
             Petname: ${newHotel.petname}
             Room type: ${newHotel.roomType}
             Room number: ${newHotel.roomNumber}
             Date: ${newHotel.startDate} - ${newHotel.endDate}
+            Check-in Time: ${formatTime}
             `,
       data: {
         hotelId: newHotel._id,
@@ -242,7 +261,6 @@ const bookHotelController = async (req, res) => {
     //notify
     const text = notificationAdmin.message;
     await notifyLine(tokenLine, text);
-
   } catch (error) {
     console.log(error);
     //
@@ -347,7 +365,7 @@ const myBookingController = async (req, res) => {
 const deleteBookingHotelController = async (req, res) => {
   try {
     const id = req.params.id;
-    const deletedBooking  = await hotelModel.findByIdAndDelete({ _id: id });
+    const deletedBooking = await hotelModel.findByIdAndDelete({ _id: id });
     if (!deletedBooking) {
       return res.status(404).send({
         success: false,
@@ -357,7 +375,7 @@ const deleteBookingHotelController = async (req, res) => {
     res.status(200).send({
       success: true,
       message: "Booking deleted successfully",
-      data: deletedBooking ,
+      data: deletedBooking,
     });
   } catch (error) {
     console.log(error);
@@ -474,44 +492,48 @@ const resetPasswordController = (req, res) => {
 
 const getUserProfileController = async (req, res) => {
   try {
-    const user = await userModel.findById({_id: req.body.userId})
+    const user = await userModel.findById({ _id: req.body.userId });
     res.status(200).send({
       success: true,
       message: "get user detail",
       data: user,
     });
   } catch (error) {
-    console.log(error)
-    res.status(500).send({ 
-      success: false, 
-      message: 'get user error' });
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "get user error",
+    });
   }
-}
+};
 
 const userEditController = async (req, res) => {
-  const {name, email, phone} = req.body;
+  const { name, email, phone } = req.body;
   try {
-    const user = await userModel.findOneAndUpdate({_id: req.body.userId}, {name, email, phone})
+    const user = await userModel.findOneAndUpdate(
+      { _id: req.body.userId },
+      { name, email, phone }
+    );
     res.status(200).send({
       success: true,
       message: "updated success",
       data: user,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.send({
       success: false,
       message: "Error to updated",
-    })
+    });
   }
-}
-
+};
 
 module.exports = {
   loginController,
   signupController,
   authController,
   bookHotelController,
+  bookGroomingController,
   getAllNotiController,
   deleteAllNotiController,
   getDetailHotelController,
@@ -523,5 +545,5 @@ module.exports = {
   userEditController,
   isRoomBooked,
   isRoomBookedController,
-  deleteBookingHotelController
+  deleteBookingHotelController,
 };

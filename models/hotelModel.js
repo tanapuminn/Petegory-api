@@ -4,7 +4,7 @@ const hotelSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId, 
-      ref: "users", // ระบุชื่อโมเดลผู้ใช้
+      ref: "users",
       required: true
     },
     name: {
@@ -28,11 +28,15 @@ const hotelSchema = new mongoose.Schema(
       required: true,
     },
     startDate: {
-      type: String,
+      type: Object,
       required: true,
     },
     endDate: {
-      type: String,
+      type: Object,
+      required: true,
+    },
+    time: {
+      type: Object,
       required: true,
     },
     status: {
