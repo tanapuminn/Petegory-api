@@ -7,11 +7,13 @@ const {
     getAllEmployeeController,
     createHotelController,
     getHotelController,
+    deleteHotelsController,
     getUserCountController,
     getBookHotelCountController,
     getBookGroomingCountController,
     changeStatusController,
     statusBookHotelController,
+    statusBookGroomingController,
     editUserController,
     updateUserController,
     deleteUserController,
@@ -23,6 +25,7 @@ const {
     deleteBookHotelController,
     getAllbookingGroomingController,
     deleteBookedGroomingController,
+    sendBookingHistory,
 } = require('../controller/adminCtrl')
 
 const router = express.Router();
@@ -47,7 +50,9 @@ router.get('/getAllEmployees', auth, getAllEmployeeController)
 router.post('/createHotels', auth, upload.single('filename'), createHotelController);
 
 router.get('/getHotels', auth, getHotelController)
+router.delete('/deleteHotels/:id', auth, deleteHotelsController)
 
+router.get('/getBookingHistory', auth, sendBookingHistory)
 
 router.get('/getUserCount', auth, getUserCountController)
 router.get('/getBookHotelCount', auth, getBookHotelCountController)
@@ -59,6 +64,8 @@ router.delete('/deleteBookedGrooming/:id', auth, deleteBookedGroomingController)
 
 router.post('/changeStatus', auth, changeStatusController)
 router.post('/statusBookHotel', auth, statusBookHotelController)
+router.post('/statusBookGrooming', auth, statusBookGroomingController)
+
 
 router.get('/editUser/:id', auth, editUserController)
 router.put('/updateUser/:id', auth, updateUserController)

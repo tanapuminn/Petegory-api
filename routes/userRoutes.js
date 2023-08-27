@@ -15,7 +15,11 @@ const {
     userEditController,
     getUserProfileController,
     isRoomBookedController,
-    deleteBookingHotelController
+    isTimeBookedController,
+    deleteBookingHotelController,
+    sendContactController,
+    myBookingGroomingController,
+    deleteBookedGroomingController,
 } = require('../controller/userCtrl');
 const auth = require('../middlewares/auth');
 
@@ -25,7 +29,6 @@ const router = express.Router();
 router.post('/login', loginController)
 
 router.post('/signup', signupController)
-// router.post('/employeesignup', employeeSignupController)
 
 router.post('/getUserData', auth, authController)
 
@@ -34,6 +37,7 @@ router.get('/isRoomBooked', auth, isRoomBookedController)
 router.post('/bookHotel', auth, bookHotelController)
 
 //Booking Grooming
+router.get('/isTimeBooked', auth, isTimeBookedController)
 router.post('/bookGrooming', auth, bookGroomingController)
 
 //Notification Hotel
@@ -47,6 +51,11 @@ router.get('/getDetailHotel', getDetailHotelController)
 router.get('/getMyBooking', auth, myBookingController)
 router.delete('/deleteBookhotel/:id',auth, deleteBookingHotelController)
 
+//get history booking Grooming
+router.get('/getMyBookingGrooming', auth, myBookingGroomingController)
+router.delete('/deleteBookedGrooming/:id', auth, deleteBookedGroomingController)
+
+//reset & forgot password
 router.post('/changePassword', auth , changePasswordController)
 router.post('/forgotPassword', forgotPasswordController)
 router.post('/resetPassword/:id/:token', resetPasswordController)
@@ -54,6 +63,9 @@ router.post('/resetPassword/:id/:token', resetPasswordController)
 // user profile
 router.get('/getUserProfile', auth, getUserProfileController)
 router.post('/editUser', auth, userEditController)
+
+//send contact
+router.post('/sendContact', auth, sendContactController)
 
 
 module.exports = router;

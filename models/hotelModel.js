@@ -7,11 +7,11 @@ const hotelSchema = new mongoose.Schema(
       ref: "users",
       required: true
     },
-    name: {
+    Name: {
       type: String,
       required: true,
     },
-    petname: {
+    PetName: {
       type: String,
       required: true,
     },
@@ -42,6 +42,10 @@ const hotelSchema = new mongoose.Schema(
     status: {
       type: String,
       default: "pending",
+    },
+    bookType: {
+      type: String,
+      default: "Hotel",
     },
   },
   { timestamps: true }

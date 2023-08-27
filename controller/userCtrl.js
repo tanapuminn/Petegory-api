@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const hotelModel = require("../models/hotelModel");
 const hoteldetailModel = require("../models/hotelDetailModel");
 const groomingModel = require("../models/groomingModel");
+const contactModel = require("../models/contactModel");
 const employeeModel = require("../models/employeeModel");
 const moment = require("moment");
 const nodemailer = require("nodemailer");
@@ -90,44 +91,104 @@ const authController = async (req, res) => {
   }
 };
 
+const isTimeBooked = async (time, date) => {
+  try {
+    const existingBooking = await groomingModel.findOne({
+      time,
+      date,
+    });
+    return !!existingBooking;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+};
+
+const isTimeBookedController = async (req, res) => {
+  const { time, date } = req.query;
+
+  try {
+    const isBooked = await isTimeBooked(time, date);
+    res.status(200).json({ isBooked });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred" });
+  }
+};
+
 const bookGroomingController = async (req, res) => {
   try {
     const userId = req.body.userId;
+    const {time, date} = req.body;
+    const isTimeAlreadyBooked = await isTimeBooked(time, date);
+    if (isTimeAlreadyBooked) {
+      res.status(400).send({
+        success: false,
+        message: "This time slot is already booked."
+      });
+      return;
+    }
+
     const newGrooming = await groomingModel({
       ...req.body,
       userId: userId,
       status: "pending",
     });
     await newGrooming.save();
-    // const adminUser = await userModel.findOne({ isAdmin: true });
-    // const employeeUser = await userModel.findOne({ isEmployee: true });
 
-    // const notificationAdmin = {
-    //   type: "grooming-booking-request",
-    //   message: `New Booking for Cat Hotel
-    //         Petname: ${newGrooming.petname}
-    //         Typepet: ${newGrooming.pettype}
-    //         number: ${newGrooming.number}
-    //         Date: ${newGrooming.date}
-    //         Add-on: ${newGrooming.addon}
-    //         Breed:${newGrooming.breed}
-    //         Time: ${newGrooming.time}น.`,
-    //   data: {
-    //     hotelId: newGrooming._id,
-    //     name: newGrooming.petname,
-    //     onClickPath: "/admin/dashboard/grooming",
-    //   },
-    // };
-    // await adminUser.save();
-    // //update notification
-    // await userModel.findOneAndUpdate(
-    //   { _id: adminUser._id },
-    //   { $push: { notification: notificationAdmin } }
-    // );
+    const adminUser = await userModel.findOne({ isAdmin: true });
+    const employeeUser = await userModel.findOne({ isEmployee: true });
+    const formatDate = moment(newGrooming.date).format("DD-MM-YYYY");
+
+    const notificationAdmin = {
+      type: "grooming-booking-request",
+      message: 
+      `มีการจองอาบน้ำ-ตัดขน
+      Petname: ${newGrooming.PetName}
+      Type_pet: ${newGrooming.pet_type}
+      Add-on: ${newGrooming.addon}
+      Breed: ${newGrooming.breed}
+      Date: ${formatDate}
+      Time: ${newGrooming.time}`,
+      data: {
+        groomingId: newGrooming._id,
+        name: newGrooming.PetName,
+        onClickPath: "/admin/dashboard/grooming",
+      },
+    };
+
+    const notificationEmployee = {
+      type: "grooming-booking-request",
+      message: 
+      `มีการจองอาบน้ำ-ตัดขน
+      Petname: ${newGrooming.PetName}
+      Type_pet: ${newGrooming.pet_type}
+      Add-on: ${newGrooming.addon}
+      Breed: ${newGrooming.breed}
+      Date: ${formatDate}
+      Time: ${newGrooming.time}`,
+      data: {
+        groomingId: newGrooming._id,
+        name: newGrooming.PetName,
+        onClickPath: "/admin/dashboard/grooming",
+      },
+    };
+    employeeUser.notification.push(notificationEmployee);
+
+    await adminUser.save();
+    await employeeUser.save();
+    //update notification
+    await userModel.findOneAndUpdate(
+      { _id: adminUser._id },
+      { $push: { notification: notificationAdmin } }
+    );
     res.status(201).send({
       success: true,
-      message: " Booking Grooming Successfully",
+      message: "Grooming Booking Successfully",
     });
+    //notify
+    const text = notificationAdmin.message;
+    await notifyLine(tokenLine, text);
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -206,40 +267,41 @@ const bookHotelController = async (req, res) => {
       status: "pending",
     });
     await newHotel.save();
+
     const adminUser = await userModel.findOne({ isAdmin: true });
     const employeeUser = await userModel.findOne({ isEmployee: true });
     const formatTime = moment(newHotel.time).format("HH:mm");
 
     const notificationAdmin = {
       type: "hotel-booking-request",
-      message: `มีการจองโรงแรมแมว
-            Name: ${newHotel.name}
-            Petname: ${newHotel.petname}
-            Room type: ${newHotel.roomType}
-            Room number: ${newHotel.roomNumber}
-            Date: ${newHotel.startDate} - ${newHotel.endDate}
-            Check-in Time: ${formatTime}
-            `,
+      message: 
+      `มีการจองโรงแรมแมว
+      Name: ${newHotel.Name}
+      Petname: ${newHotel.PetName}
+      Room type: ${newHotel.roomType}
+      Room number: ${newHotel.roomNumber}
+      Date: ${newHotel.startDate} - ${newHotel.endDate}
+      Check-in Time: ${formatTime} `,
       data: {
         hotelId: newHotel._id,
-        name: newHotel.name + " " + newHotel.petname,
+        name: newHotel.name + " " + newHotel.PetName,
         onClickPath: "/admin/dashboard/hotel",
       },
     };
 
     const notificationEmployee = {
       type: "hotel-booking-request",
-      message: `มีการจองโรงแรมแมว
-            Name: ${newHotel.name}
-            Petname: ${newHotel.petname}
-            Room type: ${newHotel.roomType}
-            Room number: ${newHotel.roomNumber}
-            Date: ${newHotel.startDate} - ${newHotel.endDate}
-            Check-in Time: ${formatTime}
-            `,
+      message: 
+      `มีการจองโรงแรมแมว
+      Name: ${newHotel.Name}
+      Petname: ${newHotel.PetName}
+      Room type: ${newHotel.roomType}
+      Room number: ${newHotel.roomNumber}
+      Date: ${newHotel.startDate} - ${newHotel.endDate}
+      Check-in Time: ${formatTime} `,
       data: {
         hotelId: newHotel._id,
-        name: newHotel.name + " " + newHotel.petname,
+        name: newHotel.Name + " " + newHotel.PetName,
         onClickPath: "/employee/dashboard/hotel",
       },
     };
@@ -366,6 +428,50 @@ const deleteBookingHotelController = async (req, res) => {
   try {
     const id = req.params.id;
     const deletedBooking = await hotelModel.findByIdAndDelete({ _id: id });
+    if (!deletedBooking) {
+      return res.status(404).send({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+    res.status(200).send({
+      success: true,
+      message: "Booking deleted successfully",
+      data: deletedBooking,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error deleting booking",
+      error,
+    });
+  }
+};
+
+const myBookingGroomingController = async (req, res) => {
+  try {
+    const loggedInUserId = req.body.userId;
+    const userBookings = await groomingModel.find({ userId: loggedInUserId });
+    res.status(200).send({
+      success: true,
+      message: "details booking list",
+      data: userBookings,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "error while fetching details",
+      error,
+    });
+  }
+};
+
+const deleteBookedGroomingController = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const deletedBooking = await groomingModel.findByIdAndDelete({ _id: id });
     if (!deletedBooking) {
       return res.status(404).send({
         success: false,
@@ -528,6 +634,43 @@ const userEditController = async (req, res) => {
   }
 };
 
+const sendContactController = async (req, res) => {
+  // const { email } = req.body;
+  const { name, email, message } = req.body;
+  try {
+    // await userModel.findOne({ email });
+    const contact = await contactModel.create({ name, email, message });
+    var transporter = nodemailer.createTransport({
+      service: "gmail",
+      secure: true,
+      auth: {
+        user: "tanapumin.fo@gmail.com",
+        pass: "umvsulynvqfehyde",
+      },
+    });
+
+    var mailOptions = {
+      from: email,
+      to: "tanapumin.fo@gmail.com",
+      subject: "Contact from petegory website",
+      text: email + "\n" + "จาก " + name + "\n" + message,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log("Email send error:", error);
+      } else {
+        console.log("Email sent:", info.response);
+        return res.send({ success: true, data: contact });
+      }
+    });
+    return res.send({ success: true });
+  } catch (error) {
+    console.log(error);
+    return res.send({ message: "An error occurred" });
+  }
+};
+
 module.exports = {
   loginController,
   signupController,
@@ -544,6 +687,10 @@ module.exports = {
   getUserProfileController,
   userEditController,
   isRoomBooked,
+  isTimeBookedController,
   isRoomBookedController,
   deleteBookingHotelController,
+  sendContactController,
+  myBookingGroomingController,
+  deleteBookedGroomingController,
 };
