@@ -119,12 +119,12 @@ const isTimeBookedController = async (req, res) => {
 const bookGroomingController = async (req, res) => {
   try {
     const userId = req.body.userId;
-    const {time, date} = req.body;
+    const { time, date } = req.body;
     const isTimeAlreadyBooked = await isTimeBooked(time, date);
     if (isTimeAlreadyBooked) {
       res.status(400).send({
         success: false,
-        message: "This time slot is already booked."
+        message: "This time slot is already booked.",
       });
       return;
     }
@@ -142,8 +142,7 @@ const bookGroomingController = async (req, res) => {
 
     const notificationAdmin = {
       type: "grooming-booking-request",
-      message: 
-      `มีการจองอาบน้ำ-ตัดขน
+      message: `มีการจองอาบน้ำ-ตัดขน
       Petname: ${newGrooming.PetName}
       Type_pet: ${newGrooming.pet_type}
       Add-on: ${newGrooming.addon}
@@ -159,8 +158,7 @@ const bookGroomingController = async (req, res) => {
 
     const notificationEmployee = {
       type: "grooming-booking-request",
-      message: 
-      `มีการจองอาบน้ำ-ตัดขน
+      message: `มีการจองอาบน้ำ-ตัดขน
       Petname: ${newGrooming.PetName}
       Type_pet: ${newGrooming.pet_type}
       Add-on: ${newGrooming.addon}
@@ -180,7 +178,9 @@ const bookGroomingController = async (req, res) => {
     //update notification
     await userModel.findOneAndUpdate(
       { _id: adminUser._id },
-      { $push: { notification: notificationAdmin } }
+      { $push: { notification: notificationAdmin } },
+      { _id: employeeUser._id },
+      { $push: { notification: notificationEmployee } }
     );
     res.status(201).send({
       success: true,
@@ -270,18 +270,16 @@ const bookHotelController = async (req, res) => {
 
     const adminUser = await userModel.findOne({ isAdmin: true });
     const employeeUser = await userModel.findOne({ isEmployee: true });
-    const formatTime = moment(newHotel.time).format("HH:mm");
 
     const notificationAdmin = {
       type: "hotel-booking-request",
-      message: 
-      `มีการจองโรงแรมแมว
+      message: `มีการจองโรงแรมแมว
       Name: ${newHotel.Name}
       Petname: ${newHotel.PetName}
       Room type: ${newHotel.roomType}
       Room number: ${newHotel.roomNumber}
       Date: ${newHotel.startDate} - ${newHotel.endDate}
-      Check-in Time: ${formatTime} `,
+      Check-in Time: ${newHotel.time} `,
       data: {
         hotelId: newHotel._id,
         name: newHotel.name + " " + newHotel.PetName,
@@ -291,14 +289,13 @@ const bookHotelController = async (req, res) => {
 
     const notificationEmployee = {
       type: "hotel-booking-request",
-      message: 
-      `มีการจองโรงแรมแมว
+      message: `มีการจองโรงแรมแมว
       Name: ${newHotel.Name}
       Petname: ${newHotel.PetName}
       Room type: ${newHotel.roomType}
       Room number: ${newHotel.roomNumber}
       Date: ${newHotel.startDate} - ${newHotel.endDate}
-      Check-in Time: ${formatTime} `,
+      Check-in Time: ${newHotel.time} `,
       data: {
         hotelId: newHotel._id,
         name: newHotel.Name + " " + newHotel.PetName,
@@ -307,14 +304,16 @@ const bookHotelController = async (req, res) => {
     };
 
     employeeUser.notification.push(notificationEmployee);
-
     await adminUser.save();
     await employeeUser.save();
-    //update notification
+
+    // Update notification for admin
     await userModel.findOneAndUpdate(
       { _id: adminUser._id },
       { $push: { notification: notificationAdmin } }
     );
+
+
     res.status(201).send({
       success: true,
       message: "Cat Hotel Booking Successfully",

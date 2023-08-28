@@ -405,7 +405,7 @@ const editBookHotelController = async (req, res) => {
 
     const user = await hotelModel.findOne(
       { _id: userId },
-      { userId: 1, _id: 0, Name: 1, PetName: 1, Time: 1 }
+      { userId: 1, _id: 0, time: 1, startDate: 1, endDate: 1 }
     );
 
     if (user) {
@@ -432,10 +432,10 @@ const editBookHotelController = async (req, res) => {
 const updateBookHotelController = async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, petname, startDate, endDate, time } = req.body;
+    const { startDate, endDate, time } = req.body;
     const updateUser = await hotelModel.findByIdAndUpdate(
       { _id: id },
-      { name, petname, startDate, endDate, time }
+      { startDate, endDate, time },
     );
     res.status(200).send({
       success: true,
