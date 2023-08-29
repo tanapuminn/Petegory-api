@@ -137,7 +137,7 @@ const bookGroomingController = async (req, res) => {
     await newGrooming.save();
 
     const adminUser = await userModel.findOne({ isAdmin: true });
-    const employeeUser = await userModel.findOne({ isEmployee: true });
+    const employeeUsers = await userModel.find({ isEmployee: true });
     const formatDate = moment(newGrooming.date).format("DD-MM-YYYY");
 
     const notificationAdmin = {
@@ -155,32 +155,39 @@ const bookGroomingController = async (req, res) => {
         onClickPath: "/admin/dashboard/grooming",
       },
     };
-
-    const notificationEmployee = {
-      type: "grooming-booking-request",
-      message: `มีการจองอาบน้ำ-ตัดขน
-      Petname: ${newGrooming.PetName}
-      Type_pet: ${newGrooming.pet_type}
-      Add-on: ${newGrooming.addon}
-      Breed: ${newGrooming.breed}
-      Date: ${formatDate}
-      Time: ${newGrooming.time}`,
-      data: {
-        groomingId: newGrooming._id,
-        name: newGrooming.PetName,
-        onClickPath: "/admin/dashboard/grooming",
-      },
-    };
-    employeeUser.notification.push(notificationEmployee);
-
+    adminUser.notification.push(notificationAdmin);
     await adminUser.save();
-    await employeeUser.save();
+
+    if (!employeeUsers) {
+      console.log("Employee user not found.");
+    } else {
+      for (const employeeUser of employeeUsers) {
+        const notificationEmployee = {
+          type: "grooming-booking-request",
+          message: `มีการจองอาบน้ำ-ตัดขน
+          Petname: ${newGrooming.PetName}
+          Type_pet: ${newGrooming.pet_type}
+          Add-on: ${newGrooming.addon}
+          Breed: ${newGrooming.breed}
+          Date: ${formatDate}
+          Time: ${newGrooming.time}`,
+          data: {
+            groomingId: newGrooming._id,
+            name: newGrooming.PetName,
+            onClickPath: "/admin/dashboard/grooming",
+          },
+        };
+
+        employeeUser.notification.push(notificationEmployee);
+        await employeeUser.save();
+        console.log("Employee user found:", employeeUsers);
+      }
+    }
+
     //update notification
     await userModel.findOneAndUpdate(
       { _id: adminUser._id },
-      { $push: { notification: notificationAdmin } },
-      { _id: employeeUser._id },
-      { $push: { notification: notificationEmployee } }
+      { $push: { notification: notificationAdmin } }
     );
     res.status(201).send({
       success: true,
@@ -260,7 +267,7 @@ const bookHotelController = async (req, res) => {
         message: "This room is already booked.",
       });
     }
-    ///
+
     const newHotel = await hotelModel({
       ...req.body,
       userId: userId,
@@ -269,7 +276,7 @@ const bookHotelController = async (req, res) => {
     await newHotel.save();
 
     const adminUser = await userModel.findOne({ isAdmin: true });
-    const employeeUser = await userModel.findOne({ isEmployee: true });
+    const employeeUsers = await userModel.find({ isEmployee: true });
 
     const notificationAdmin = {
       type: "hotel-booking-request",
@@ -287,32 +294,45 @@ const bookHotelController = async (req, res) => {
       },
     };
 
-    const notificationEmployee = {
-      type: "hotel-booking-request",
-      message: `มีการจองโรงแรมแมว
-      Name: ${newHotel.Name}
-      Petname: ${newHotel.PetName}
-      Room type: ${newHotel.roomType}
-      Room number: ${newHotel.roomNumber}
-      Date: ${newHotel.startDate} - ${newHotel.endDate}
-      Check-in Time: ${newHotel.time} `,
-      data: {
-        hotelId: newHotel._id,
-        name: newHotel.Name + " " + newHotel.PetName,
-        onClickPath: "/employee/dashboard/hotel",
-      },
-    };
-
-    employeeUser.notification.push(notificationEmployee);
+    adminUser.notification.push(notificationAdmin);
     await adminUser.save();
-    await employeeUser.save();
+
+    if (!employeeUsers) {
+      console.log("Employee user not found.");
+    } else {
+      for (const employeeUser of employeeUsers) {
+        const notificationEmployee = {
+          type: "hotel-booking-request",
+          message: `มีการจองโรงแรมแมว
+          Name: ${newHotel.Name}
+          Petname: ${newHotel.PetName}
+          Room type: ${newHotel.roomType}
+          Room number: ${newHotel.roomNumber}
+          Date: ${newHotel.startDate} - ${newHotel.endDate}
+          Check-in Time: ${newHotel.time} `,
+          data: {
+            hotelId: newHotel._id,
+            name: newHotel.name + " " + newHotel.PetName,
+            onClickPath: "/admin/dashboard/hotel",
+          },
+        };
+
+        employeeUser.notification.push(notificationEmployee);
+        await employeeUser.save();
+        console.log("Employee user found:", employeeUsers);
+      }
+    }
 
     // Update notification for admin
     await userModel.findOneAndUpdate(
       { _id: adminUser._id },
       { $push: { notification: notificationAdmin } }
     );
-
+    // Update notification for employee
+    // await userModel.findByIdAndUpdate(
+    //   { _id: employeeUsers._id },
+    //   { $push: { notification: notificationEmployee } }
+    // );
 
     res.status(201).send({
       success: true,
@@ -343,12 +363,17 @@ const bookHotelController = async (req, res) => {
 const getAllNotiController = async (req, res) => {
   try {
     const user = await userModel.findOne({ _id: req.body.userId });
+
     const seenotification = user.seenotification;
     const notification = user.notification;
+
     seenotification.push(...notification);
+
     user.notification = [];
     user.seenotification = notification;
+
     const updatedUser = await user.save();
+
     res.status(200).send({
       success: true,
       message: "all notification marked as read",

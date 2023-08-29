@@ -164,20 +164,41 @@ const getBookGroomingCountController = async (req, res) => {
 
 const changeStatusController = async (req, res) => {
   try {
-    const { isEmployee } = req.body;
-    const employees = await userModel.findByIdAndUpdate(isEmployee);
-
-    // ตรวจสอบว่าค่า role เป็น 'barber' เพื่อกำหนดค่า isEmployee เป็น true
-    if (employees.role === "barber") {
-      employees.isEmployee = true;
+    const {isEmployee} = req.body;
+    const user = await userModel.findById(isEmployee);
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: 'User not found'
+      })
     }
+    if (isEmployee) {
+      user.isEmployee = true;
+    }
+    await user.save();
+    // const { isEmployee } = req.body;
+    // const employees = await userModel.findByIdAndUpdate(
+    //   isEmployee,
+    //   { isEmployee: true },
+    //   { new: true }
+    // );
+    // if (!employees) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: "Employee not found",
+    //   });
+    // }
+    // // ตรวจสอบว่าค่า role เป็น 'barber' เพื่อกำหนดค่า isEmployee เป็น true
+    // if (employees.role === "barber") {
+    //   employees.isEmployee = true;
+    // }
 
-    await employees.save();
+    // await employees.save();
 
     res.status(201).send({
       success: true,
       message: "Account Status Updated",
-      data: employees,
+      data: user,
     });
   } catch (error) {
     console.log(error);
@@ -435,7 +456,7 @@ const updateBookHotelController = async (req, res) => {
     const { startDate, endDate, time } = req.body;
     const updateUser = await hotelModel.findByIdAndUpdate(
       { _id: id },
-      { startDate, endDate, time },
+      { startDate, endDate, time }
     );
     res.status(200).send({
       success: true,
