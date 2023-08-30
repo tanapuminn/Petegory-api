@@ -47,6 +47,10 @@ const hotelSchema = new mongoose.Schema(
       type: String,
       default: "Hotel",
     },
+    lineId: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

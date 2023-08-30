@@ -7,6 +7,8 @@ const {
     getAllEmployeeController,
     createHotelController,
     getHotelController,
+    editHotelController,
+    updateHotelController,
     deleteHotelsController,
     getUserCountController,
     getBookHotelCountController,
@@ -49,7 +51,10 @@ router.get('/getAllEmployees', auth, getAllEmployeeController)
 
 router.post('/createHotels', auth, upload.single('filename'), createHotelController);
 
+// hotel details
 router.get('/getHotels', auth, getHotelController)
+router.get('/editHotel/:id', auth, editHotelController)
+router.put('/updateHotel/:id', auth, upload.single("filename"), updateHotelController)
 router.delete('/deleteHotels/:id', auth, deleteHotelsController)
 
 router.get('/getBookingHistory', auth, sendBookingHistory)
@@ -62,15 +67,17 @@ router.get('/getBookGroomingCount', auth, getBookGroomingCountController)
 router.get('/allBookedGrooming', auth, getAllbookingGroomingController)
 router.delete('/deleteBookedGrooming/:id', auth, deleteBookedGroomingController)
 
+//change status
 router.post('/changeStatus', auth, changeStatusController)
 router.post('/statusBookHotel', auth, statusBookHotelController)
 router.post('/statusBookGrooming', auth, statusBookGroomingController)
 
-
+//admin get users
 router.get('/editUser/:id', auth, editUserController)
 router.put('/updateUser/:id', auth, updateUserController)
 router.delete('/deleteUser/:id', auth, deleteUserController);
 
+//admin get employees
 router.get('/editEmployee/:id', auth, editEmployeeController)
 router.put('/updateEmployee/:id', auth, updateEmployeeController)
 

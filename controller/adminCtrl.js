@@ -3,6 +3,7 @@ const hotelDetailModel = require("../models/hotelDetailModel");
 const employeeModel = require("../models/employeeModel");
 const hotelModel = require("../models/hotelModel");
 const groomingModel = require("../models/groomingModel");
+const path = require('path')
 
 const getAllUsersController = async (req, res) => {
   try {
@@ -80,6 +81,70 @@ const getHotelController = async (req, res) => {
       success: false,
       message: "error while fetching details",
       error,
+    });
+  }
+};
+
+const editHotelController = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const hotel = await hotelDetailModel.findById({ _id: id });
+
+    if (hotel) {
+      res.status(200).send({
+        success: true,
+        message: "Hotel data get successfully",
+        data: hotel,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: "Hotel not found",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error get hotel data",
+    });
+  }
+};
+
+const updateHotelController = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { type, price, title1, title2, title3, title4, title5,} = req.body;
+  
+    let updateFields = {
+      type,
+      price,
+      title1,
+      title2,
+      title3,
+      title4,
+      title5,
+    };
+    if (req.file) {
+      updateFields.image = req.file.filename;
+    }
+    const updateHotel = await hotelDetailModel.findByIdAndUpdate(
+      { _id: id },
+      updateFields,
+      { new: true }
+    );
+
+    res.status(200).send({
+      success: true,
+      message: "Update hotel successfully",
+      data: updateHotel,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error updating hotel data",
     });
   }
 };
@@ -164,36 +229,18 @@ const getBookGroomingCountController = async (req, res) => {
 
 const changeStatusController = async (req, res) => {
   try {
-    const {isEmployee} = req.body;
+    const { isEmployee } = req.body;
     const user = await userModel.findById(isEmployee);
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: 'User not found'
-      })
+        message: "User not found",
+      });
     }
     if (isEmployee) {
       user.isEmployee = true;
     }
     await user.save();
-    // const { isEmployee } = req.body;
-    // const employees = await userModel.findByIdAndUpdate(
-    //   isEmployee,
-    //   { isEmployee: true },
-    //   { new: true }
-    // );
-    // if (!employees) {
-    //   return res.status(404).json({
-    //     success: false,
-    //     message: "Employee not found",
-    //   });
-    // }
-    // // ตรวจสอบว่าค่า role เป็น 'barber' เพื่อกำหนดค่า isEmployee เป็น true
-    // if (employees.role === "barber") {
-    //   employees.isEmployee = true;
-    // }
-
-    // await employees.save();
 
     res.status(201).send({
       success: true,
@@ -404,6 +451,7 @@ const updateEmployeeController = async (req, res) => {
 const getAllbookingHotelsController = async (req, res) => {
   try {
     const user = await hotelModel.find();
+    user.sort((a, b) => b.createdAt - a.createdAt);
     res.status(200).send({
       success: true,
       message: "all details booking list",
@@ -494,6 +542,7 @@ const deleteBookHotelController = async (req, res) => {
 const getAllbookingGroomingController = async (req, res) => {
   try {
     const user = await groomingModel.find();
+    user.sort((a, b) => b.createdAt - a.createdAt);
     res.status(200).send({
       success: true,
       message: "all details booking list",
@@ -556,6 +605,8 @@ module.exports = {
   getAllEmployeeController,
   createHotelController,
   getHotelController,
+  editHotelController,
+  updateHotelController,
   deleteHotelsController,
   getUserCountController,
   getBookHotelCountController,
