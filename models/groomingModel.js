@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const groomingSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: 'users',
       required: true,
     },
     PetName: {
@@ -16,6 +16,10 @@ const groomingSchema = new mongoose.Schema(
     },
     email: {
       type: String,
+      // require: true,
+    },
+    breed: {
+      type: String,
       require: true,
     },
     phone: {
@@ -24,6 +28,10 @@ const groomingSchema = new mongoose.Schema(
     },
     pet_type: {
       type: String,
+      require: true,
+    },
+    grooming: {
+      type: Array,
       require: true,
     },
     addon: {
@@ -40,15 +48,15 @@ const groomingSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: "pending",
+      default: 'pending',
     },
     bookType: {
       type: String,
-      default: "Grooming",
+      default: 'Grooming',
     },
   },
   { timestamps: true }
 );
 
-const groomingModel = mongoose.model("bookingGrooming", groomingSchema);
+const groomingModel = mongoose.model('bookingGrooming', groomingSchema);
 module.exports = groomingModel;
