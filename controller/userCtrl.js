@@ -147,6 +147,7 @@ const bookGroomingController = async (req, res) => {
       Type_pet: ${newGrooming.pet_type}
       Add-on: ${newGrooming.addon}
       Breed: ${newGrooming.breed}
+      Service: ${newGrooming.grooming}
       Date: ${formatDate}
       Time: ${newGrooming.time}`,
       data: {
@@ -169,6 +170,7 @@ const bookGroomingController = async (req, res) => {
           Type_pet: ${newGrooming.pet_type}
           Add-on: ${newGrooming.addon}
           Breed: ${newGrooming.breed}
+          Service: ${newGrooming.grooming}
           Date: ${formatDate}
           Time: ${newGrooming.time}`,
           data: {
