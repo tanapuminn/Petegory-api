@@ -26,6 +26,10 @@ const groomingSchema = new mongoose.Schema(
       type: String,
       require: true,
     },
+    idline: {
+      type: String,
+      require: true,
+    },
     pet_type: {
       type: String,
       require: true,
