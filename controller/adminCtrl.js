@@ -61,6 +61,99 @@ const createNewsController = async (req, res) => {
   }
 };
 
+const editNewsController = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const news = await newsModel.findById({ _id: id });
+
+    if (news) {
+      res.status(200).send({
+        success: true,
+        message: 'News data get successfully',
+        data: news,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: 'News not found',
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: 'Error get news data',
+    });
+  }
+};
+
+const updateNewsController = async (req, res) => {
+  try {
+    const id = req.params.id;
+    // const { type, price, title1, title2, title3, title4, title5 } = req.body;
+
+    let updateFields = {};
+    if (req.file) {
+      updateFields.image = req.file.filename;
+    }
+    const updateNews = await newsModel.findByIdAndUpdate(
+      { _id: id },
+      updateFields,
+      { new: true }
+    );
+
+    res.status(200).send({
+      success: true,
+      message: 'Update news successfully',
+      data: updateNews,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: 'Error updating news data',
+    });
+  }
+};
+
+const deleteNewsController = async (req,res) => {
+  try {
+    const userId = req.params.id;
+    const user = await newsModel.findByIdAndDelete({ _id: userId });
+    res.status(200).send({
+      success: true,
+      message: 'Deleted News successfully',
+      data: user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: 'Error deleting News',
+      error,
+    });
+  }
+}
+
+const getNewsController = async (req, res) => {
+  try {
+    const detail = await newsModel.find({});
+    res.status(200).send({
+      success: true,
+      message: 'details data list',
+      data: detail,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: 'error while fetching details',
+      error,
+    });
+  }
+};
+
 const createHotelController = async (req, res) => {
   try {
     await hotelDetailModel.create({
@@ -647,4 +740,8 @@ module.exports = {
   deleteBookedGroomingController,
   sendBookingHistory,
   createNewsController,
+  getNewsController,
+  deleteNewsController,
+  editNewsController,
+  updateNewsController,
 };

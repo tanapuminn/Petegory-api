@@ -6,6 +6,7 @@ const hoteldetailModel = require('../models/hotelDetailModel');
 const groomingModel = require('../models/groomingModel');
 const contactModel = require('../models/contactModel');
 const employeeModel = require('../models/employeeModel');
+const newsModel = require('../models/newsModel')
 const moment = require('moment');
 const nodemailer = require('nodemailer');
 
@@ -699,6 +700,23 @@ const sendContactController = async (req, res) => {
   }
 };
 
+const getNewsController = async (req,res) => {
+  try {
+    const news = await newsModel.find()
+    res.status(200).send({
+      success: true,
+      message: 'get news success',
+      data: news,
+    });
+  } catch (error) {
+    console.log(error)
+    res.send({
+      success: false,
+      message: 'Error to get News',
+    });
+  }
+}
+
 module.exports = {
   loginController,
   signupController,
@@ -721,4 +739,5 @@ module.exports = {
   sendContactController,
   myBookingGroomingController,
   deleteBookedGroomingController,
+  getNewsController,
 };
