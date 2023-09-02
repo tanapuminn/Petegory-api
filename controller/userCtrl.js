@@ -6,7 +6,7 @@ const hoteldetailModel = require('../models/hotelDetailModel');
 const groomingModel = require('../models/groomingModel');
 const contactModel = require('../models/contactModel');
 const employeeModel = require('../models/employeeModel');
-const newsModel = require('../models/newsModel')
+const newsModel = require('../models/newsModel');
 const moment = require('moment');
 const nodemailer = require('nodemailer');
 
@@ -134,6 +134,7 @@ const bookGroomingController = async (req, res) => {
       ...req.body,
       userId: userId,
       status: 'pending',
+      // date: moment(date, 'DD-MM-YYYY').format('DD-MM-YYYY'),
     });
     await newGrooming.save();
 
@@ -700,22 +701,22 @@ const sendContactController = async (req, res) => {
   }
 };
 
-const getNewsController = async (req,res) => {
+const getNewsController = async (req, res) => {
   try {
-    const news = await newsModel.find()
+    const news = await newsModel.find();
     res.status(200).send({
       success: true,
       message: 'get news success',
       data: news,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.send({
       success: false,
       message: 'Error to get News',
     });
   }
-}
+};
 
 module.exports = {
   loginController,

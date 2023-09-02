@@ -117,7 +117,7 @@ const updateNewsController = async (req, res) => {
   }
 };
 
-const deleteNewsController = async (req,res) => {
+const deleteNewsController = async (req, res) => {
   try {
     const userId = req.params.id;
     const user = await newsModel.findByIdAndDelete({ _id: userId });
@@ -134,7 +134,7 @@ const deleteNewsController = async (req,res) => {
       error,
     });
   }
-}
+};
 
 const getNewsController = async (req, res) => {
   try {
@@ -670,6 +670,58 @@ const getAllbookingGroomingController = async (req, res) => {
     });
   }
 };
+const editBookGroomingController = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    // const user = {userId}
+
+    const user = await groomingModel.findOne(
+      { _id: userId },
+      { userId: 1, _id: 0, time: 1, date: 1, grooming: 1, addon: 1 }
+    );
+
+    if (user) {
+      res.status(200).send({
+        success: true,
+        message: 'User Booked get successfully',
+        data: user,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: 'User Booked not found',
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: 'Error get User Booked',
+    });
+  }
+};
+
+const updateBookGroomingController = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { date, time, grooming, addon } = req.body;
+    const updateUser = await groomingModel.findByIdAndUpdate(
+      { _id: id },
+      { date, time, grooming, addon }
+    );
+    res.status(200).send({
+      success: true,
+      message: 'Update User Booked successfully',
+      data: updateUser,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: 'Error updating User Booked',
+    });
+  }
+};
 const deleteBookedGroomingController = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -737,6 +789,8 @@ module.exports = {
   updateBookHotelController,
   deleteBookHotelController,
   getAllbookingGroomingController,
+  editBookGroomingController,
+  updateBookGroomingController,
   deleteBookedGroomingController,
   sendBookingHistory,
   createNewsController,

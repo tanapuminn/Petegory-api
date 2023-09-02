@@ -1,7 +1,7 @@
-const express = require("express");
-const auth = require("../middlewares/auth");
-const multer = require("multer");
-const path = require("path");
+const express = require('express');
+const auth = require('../middlewares/auth');
+const multer = require('multer');
+const path = require('path');
 const {
   getAllUsersController,
   getAllEmployeeController,
@@ -27,24 +27,27 @@ const {
   deleteBookHotelController,
   getAllbookingGroomingController,
   deleteBookedGroomingController,
+  editBookGroomingController,
+  updateBookGroomingController,
   sendBookingHistory,
   createNewsController,
   getNewsController,
   deleteNewsController,
   editNewsController,
   updateNewsController,
-} = require("../controller/adminCtrl");
+} = require('../controller/adminCtrl');
 
 const router = express.Router();
 
 const storage = multer.diskStorage({
   destination: (req, file, cd) => {
-    cd(null, "C:/programing/fullstack/projectdraft/petegory/public/images");
+    // cd(null, "C:/programing/fullstack/projectdraft/petegory/public/images");
+    cd(null, process.env.PATH_IMAGES_FOGUS);
   },
   filename: (req, file, cd) => {
     cd(
       null,
-      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+      file.fieldname + '_' + Date.now() + path.extname(file.originalname)
     );
   },
 });
@@ -53,52 +56,78 @@ const upload = multer({
   storage: storage,
 });
 
-router.get("/getAllUsers", auth, getAllUsersController);
+router.get('/getAllUsers', auth, getAllUsersController);
 
-router.get("/getAllEmployees", auth, getAllEmployeeController);
+router.get('/getAllEmployees', auth, getAllEmployeeController);
 
 //news
-router.post("/createNews", auth, upload.single("filename"), createNewsController);
-router.get("/getNews", auth, getNewsController);
-router.get("/editNews/:id", auth, editNewsController);
-router.put("/updateNews/:id", auth, upload.single("filename"), updateNewsController);
-router.delete("/deleteNews/:id", auth, deleteNewsController);
+router.post(
+  '/createNews',
+  auth,
+  upload.single('filename'),
+  createNewsController
+);
+router.get('/getNews', auth, getNewsController);
+router.get('/editNews/:id', auth, editNewsController);
+router.put(
+  '/updateNews/:id',
+  auth,
+  upload.single('filename'),
+  updateNewsController
+);
+router.delete('/deleteNews/:id', auth, deleteNewsController);
 
 // hotel details
-router.post("/createHotels", auth, upload.single("filename"), createHotelController);
-router.get("/getHotels", auth, getHotelController);
-router.get("/editHotel/:id", auth, editHotelController);
-router.put("/updateHotel/:id", auth, upload.single("filename"), updateHotelController);
-router.delete("/deleteHotels/:id", auth, deleteHotelsController);
+router.post(
+  '/createHotels',
+  auth,
+  upload.single('filename'),
+  createHotelController
+);
+router.get('/getHotels', auth, getHotelController);
+router.get('/editHotel/:id', auth, editHotelController);
+router.put(
+  '/updateHotel/:id',
+  auth,
+  upload.single('filename'),
+  updateHotelController
+);
+router.delete('/deleteHotels/:id', auth, deleteHotelsController);
 
-router.get("/getBookingHistory", auth, sendBookingHistory);
+router.get('/getBookingHistory', auth, sendBookingHistory);
 
-router.get("/getUserCount", auth, getUserCountController);
-router.get("/getBookHotelCount", auth, getBookHotelCountController);
-router.get("/getBookGroomingCount", auth, getBookGroomingCountController);
+router.get('/getUserCount', auth, getUserCountController);
+router.get('/getBookHotelCount', auth, getBookHotelCountController);
+router.get('/getBookGroomingCount', auth, getBookGroomingCountController);
 
 //Booking Grooming
-router.get("/allBookedGrooming", auth, getAllbookingGroomingController);
-router.delete("/deleteBookedGrooming/:id", auth, deleteBookedGroomingController);
+router.get('/allBookedGrooming', auth, getAllbookingGroomingController);
+router.delete(
+  '/deleteBookedGrooming/:id',
+  auth,
+  deleteBookedGroomingController
+);
+router.get('/editBookGrooming/:id', auth, editBookGroomingController);
+router.put('/updateBookGrooming/:id', auth, updateBookGroomingController);
 
 //change status
-router.post("/changeStatus", auth, changeStatusController);
-router.post("/statusBookHotel", auth, statusBookHotelController);
-router.post("/statusBookGrooming", auth, statusBookGroomingController);
+router.post('/changeStatus', auth, changeStatusController);
+router.post('/statusBookHotel', auth, statusBookHotelController);
+router.post('/statusBookGrooming', auth, statusBookGroomingController);
 
 //admin get users
-router.get("/editUser/:id", auth, editUserController);
-router.put("/updateUser/:id", auth, updateUserController);
-router.delete("/deleteUser/:id", auth, deleteUserController);
+router.get('/editUser/:id', auth, editUserController);
+router.put('/updateUser/:id', auth, updateUserController);
+router.delete('/deleteUser/:id', auth, deleteUserController);
 
 //admin get employees
-router.get("/editEmployee/:id", auth, editEmployeeController);
-router.put("/updateEmployee/:id", auth, updateEmployeeController);
+router.get('/editEmployee/:id', auth, editEmployeeController);
+router.put('/updateEmployee/:id', auth, updateEmployeeController);
 
 //Booking Hotel
-router.get("/allBookedHotel", auth, getAllbookingHotelsController);
-router.get("/editBookHotel/:id", auth, editBookHotelController);
-router.put("/updateBookHotel/:id", auth, updateBookHotelController);
-router.delete("/deleteBookHotel/:id", auth, deleteBookHotelController);
+router.get('/allBookedHotel', auth, getAllbookingHotelsController);
+router.get('/editBookHotel/:id', auth, editBookHotelController);
+router.put('/updateBookHotel/:id', auth, updateBookHotelController);
+router.delete('/deleteBookHotel/:id', auth, deleteBookHotelController);
 
 module.exports = router;
