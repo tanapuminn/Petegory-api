@@ -1,23 +1,24 @@
-const userModel = require("../models/userModels");
-const hotelDetailModel = require("../models/hotelDetailModel");
-const employeeModel = require("../models/employeeModel");
-const hotelModel = require("../models/hotelModel");
-const groomingModel = require("../models/groomingModel");
-const path = require('path')
+const userModel = require('../models/userModels');
+const hotelDetailModel = require('../models/hotelDetailModel');
+const employeeModel = require('../models/employeeModel');
+const hotelModel = require('../models/hotelModel');
+const groomingModel = require('../models/groomingModel');
+const newsModel = require('../models/newsModel');
+const path = require('path');
 
 const getAllUsersController = async (req, res) => {
   try {
     const users = await userModel.find({ isAdmin: false, isEmployee: false });
     res.status(200).send({
       success: true,
-      message: "users data list",
+      message: 'users data list',
       data: users,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching users",
+      message: 'error while fetching users',
       error,
     });
   }
@@ -28,14 +29,33 @@ const getAllEmployeeController = async (req, res) => {
     const employees = await userModel.find({ isEmployee: true });
     res.status(200).send({
       success: true,
-      message: "employees data list",
+      message: 'employees data list',
       data: employees,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching users",
+      message: 'error while fetching users',
+      error,
+    });
+  }
+};
+
+const createNewsController = async (req, res) => {
+  try {
+    await newsModel.create({
+      image: req.file.filename,
+    });
+    res.status(200).send({
+      success: true,
+      message: 'create news success',
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: 'create news error',
       error,
     });
   }
@@ -55,13 +75,13 @@ const createHotelController = async (req, res) => {
     });
     res.status(200).send({
       success: true,
-      message: "create detail success",
+      message: 'create detail success',
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "create details error",
+      message: 'create details error',
       error,
     });
   }
@@ -72,14 +92,14 @@ const getHotelController = async (req, res) => {
     const detail = await hotelDetailModel.find({});
     res.status(200).send({
       success: true,
-      message: "details data list",
+      message: 'details data list',
       data: detail,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: 'error while fetching details',
       error,
     });
   }
@@ -94,20 +114,20 @@ const editHotelController = async (req, res) => {
     if (hotel) {
       res.status(200).send({
         success: true,
-        message: "Hotel data get successfully",
+        message: 'Hotel data get successfully',
         data: hotel,
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "Hotel not found",
+        message: 'Hotel not found',
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error get hotel data",
+      message: 'Error get hotel data',
     });
   }
 };
@@ -115,8 +135,8 @@ const editHotelController = async (req, res) => {
 const updateHotelController = async (req, res) => {
   try {
     const id = req.params.id;
-    const { type, price, title1, title2, title3, title4, title5,} = req.body;
-  
+    const { type, price, title1, title2, title3, title4, title5 } = req.body;
+
     let updateFields = {
       type,
       price,
@@ -137,14 +157,14 @@ const updateHotelController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: "Update hotel successfully",
+      message: 'Update hotel successfully',
       data: updateHotel,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error updating hotel data",
+      message: 'Error updating hotel data',
     });
   }
 };
@@ -155,14 +175,14 @@ const deleteHotelsController = async (req, res) => {
     const user = await hotelDetailModel.findByIdAndDelete({ _id: userId });
     res.status(200).send({
       success: true,
-      message: "Deleted Hotel successfully",
+      message: 'Deleted Hotel successfully',
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error deleting Hotel",
+      message: 'Error deleting Hotel',
       error,
     });
   }
@@ -176,14 +196,14 @@ const getUserCountController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: "users total list",
+      message: 'users total list',
       data: userCount,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: 'error while fetching details',
       error,
     });
   }
@@ -195,14 +215,14 @@ const getBookHotelCountController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: "Hotel Booking total list",
+      message: 'Hotel Booking total list',
       data: BookingHotelCount,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: 'error while fetching details',
       error,
     });
   }
@@ -214,14 +234,14 @@ const getBookGroomingCountController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: "Grooming Booking total list",
+      message: 'Grooming Booking total list',
       data: BookingGroomingCount,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: 'error while fetching details',
       error,
     });
   }
@@ -234,7 +254,7 @@ const changeStatusController = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "User not found",
+        message: 'User not found',
       });
     }
     if (isEmployee) {
@@ -244,14 +264,14 @@ const changeStatusController = async (req, res) => {
 
     res.status(201).send({
       success: true,
-      message: "Account Status Updated",
+      message: 'Account Status Updated',
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error in Account Status",
+      message: 'Error in Account Status',
       error,
     });
   }
@@ -265,31 +285,31 @@ const statusBookHotelController = async (req, res) => {
     if (!bookHotel) {
       return res.status(404).send({
         success: false,
-        message: "Hotel booking not found.",
+        message: 'Hotel booking not found.',
       });
     }
 
-    if (bookHotel.status === "pending") {
-      bookHotel.status = "success";
+    if (bookHotel.status === 'pending') {
+      bookHotel.status = 'success';
 
       await bookHotel.save();
 
       res.status(201).send({
         success: true,
-        message: "Status is Updated",
+        message: 'Status is Updated',
         data: bookHotel,
       });
     } else {
       res.status(400).send({
         success: false,
-        message: "Invalid status update.",
+        message: 'Invalid status update.',
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error in Update Status",
+      message: 'Error in Update Status',
       error,
     });
   }
@@ -302,31 +322,31 @@ const statusBookGroomingController = async (req, res) => {
     if (!bookGrooming) {
       return res.status(404).send({
         success: false,
-        message: "Frooming booking not found.",
+        message: 'Frooming booking not found.',
       });
     }
 
-    if (bookGrooming.status === "pending") {
-      bookGrooming.status = "success";
+    if (bookGrooming.status === 'pending') {
+      bookGrooming.status = 'success';
 
       await bookGrooming.save();
 
       res.status(201).send({
         success: true,
-        message: "Status is Updated",
+        message: 'Status is Updated',
         data: bookGrooming,
       });
     } else {
       res.status(400).send({
         success: false,
-        message: "Invalid status update.",
+        message: 'Invalid status update.',
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error in Update Status",
+      message: 'Error in Update Status',
       error,
     });
   }
@@ -341,20 +361,20 @@ const editUserController = async (req, res) => {
     if (user) {
       res.status(200).send({
         success: true,
-        message: "User data get successfully",
+        message: 'User data get successfully',
         data: user,
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "User not found",
+        message: 'User not found',
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error get user data",
+      message: 'Error get user data',
     });
   }
 };
@@ -369,14 +389,14 @@ const updateUserController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      message: "Update user successfully",
+      message: 'Update user successfully',
       data: updateUser,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error updating user data",
+      message: 'Error updating user data',
     });
   }
 };
@@ -387,14 +407,14 @@ const deleteUserController = async (req, res) => {
     const user = await userModel.findByIdAndDelete({ _id: id });
     res.status(200).send({
       success: true,
-      message: "User deleted successfully",
+      message: 'User deleted successfully',
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error deleting user",
+      message: 'Error deleting user',
       error,
     });
   }
@@ -409,20 +429,20 @@ const editEmployeeController = async (req, res) => {
     if (user) {
       res.status(200).send({
         success: true,
-        message: "Employee data get successfully",
+        message: 'Employee data get successfully',
         data: user,
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "Employee not found",
+        message: 'Employee not found',
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error get Employee data",
+      message: 'Error get Employee data',
     });
   }
 };
@@ -437,14 +457,14 @@ const updateEmployeeController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      message: "Update Employee successfully",
+      message: 'Update Employee successfully',
       data: updateUser,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error updating Employee data",
+      message: 'Error updating Employee data',
     });
   }
 };
@@ -454,14 +474,14 @@ const getAllbookingHotelsController = async (req, res) => {
     user.sort((a, b) => b.createdAt - a.createdAt);
     res.status(200).send({
       success: true,
-      message: "all details booking list",
+      message: 'all details booking list',
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: 'error while fetching details',
       error,
     });
   }
@@ -480,20 +500,20 @@ const editBookHotelController = async (req, res) => {
     if (user) {
       res.status(200).send({
         success: true,
-        message: "User Booked get successfully",
+        message: 'User Booked get successfully',
         data: user,
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "User Booked not found",
+        message: 'User Booked not found',
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error get User Booked",
+      message: 'Error get User Booked',
     });
   }
 };
@@ -508,14 +528,14 @@ const updateBookHotelController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      message: "Update User Booked successfully",
+      message: 'Update User Booked successfully',
       data: updateUser,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error updating User Booked",
+      message: 'Error updating User Booked',
     });
   }
 };
@@ -526,14 +546,14 @@ const deleteBookHotelController = async (req, res) => {
     const user = await hotelModel.findByIdAndDelete({ _id: userId });
     res.status(200).send({
       success: true,
-      message: "Booked Hotel deleted successfully",
+      message: 'Booked Hotel deleted successfully',
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error deleting Booked Hotel",
+      message: 'Error deleting Booked Hotel',
       error,
     });
   }
@@ -545,14 +565,14 @@ const getAllbookingGroomingController = async (req, res) => {
     user.sort((a, b) => b.createdAt - a.createdAt);
     res.status(200).send({
       success: true,
-      message: "all details booking list",
+      message: 'all details booking list',
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: 'error while fetching details',
       error,
     });
   }
@@ -563,14 +583,14 @@ const deleteBookedGroomingController = async (req, res) => {
     const user = await groomingModel.findByIdAndDelete({ _id: userId });
     res.status(200).send({
       success: true,
-      message: "Booked Grooming deleted successfully",
+      message: 'Booked Grooming deleted successfully',
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error deleting Booked Grooming",
+      message: 'Error deleting Booked Grooming',
       error,
     });
   }
@@ -578,8 +598,8 @@ const deleteBookedGroomingController = async (req, res) => {
 
 const getBookingHistory = async () => {
   try {
-    const hotelBookings = await hotelModel.find({ status: "pending" });
-    const groomingBookings = await groomingModel.find({ status: "pending" });
+    const hotelBookings = await hotelModel.find({ status: 'pending' });
+    const groomingBookings = await groomingModel.find({ status: 'pending' });
 
     const bookingHistory = [...hotelBookings, ...groomingBookings];
 
@@ -596,7 +616,7 @@ const sendBookingHistory = async (req, res) => {
     return res.status(200).send({ success: true, data: bookingHistory });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ success: false, error: "An error occurred" });
+    return res.status(500).send({ success: false, error: 'An error occurred' });
   }
 };
 
@@ -626,4 +646,5 @@ module.exports = {
   getAllbookingGroomingController,
   deleteBookedGroomingController,
   sendBookingHistory,
+  createNewsController,
 };
