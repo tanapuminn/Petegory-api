@@ -109,8 +109,8 @@ const isTimeBookedController = async (req, res) => {
   const { time, date } = req.query;
 
   try {
-    const isBooked = await isTimeBooked(time, date);
-    res.status(200).json({ isBooked });
+    const bookedTimeSlots = await isTimeBooked(time, date);
+    res.status(200).send({ bookedTimeSlots });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred' });
