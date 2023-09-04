@@ -35,6 +35,12 @@ const {
   deleteNewsController,
   editNewsController,
   updateNewsController,
+  createGallController,
+  getGallController,
+  editGallController,
+  updateGallController,
+  deleteGallController,
+
 } = require('../controller/adminCtrl');
 
 const router = express.Router();
@@ -57,56 +63,39 @@ const upload = multer({
 });
 
 router.get('/getAllUsers', auth, getAllUsersController);
-
 router.get('/getAllEmployees', auth, getAllEmployeeController);
 
 //news
-router.post(
-  '/createNews',
-  auth,
-  upload.single('filename'),
-  createNewsController
-);
+router.post('/createNews', auth, upload.single('filename'), createNewsController);
 router.get('/getNews', auth, getNewsController);
 router.get('/editNews/:id', auth, editNewsController);
-router.put(
-  '/updateNews/:id',
-  auth,
-  upload.single('filename'),
-  updateNewsController
-);
+router.put('/updateNews/:id', auth, upload.single('filename'), updateNewsController);
 router.delete('/deleteNews/:id', auth, deleteNewsController);
 
+//gallery
+router.post('/createGall', auth, upload.single('filename'), createGallController);
+router.get('/getGall', auth, getGallController);
+router.get('/editGall/:id', auth, editGallController);
+router.put('/updateGall/:id', auth, upload.single('filename'), updateGallController);
+router.delete('/deleteGall/:id', auth, deleteGallController);
+
 // hotel details
-router.post(
-  '/createHotels',
-  auth,
-  upload.single('filename'),
-  createHotelController
-);
+router.post('/createHotels', auth, upload.single('filename'), createHotelController);
 router.get('/getHotels', auth, getHotelController);
 router.get('/editHotel/:id', auth, editHotelController);
-router.put(
-  '/updateHotel/:id',
-  auth,
-  upload.single('filename'),
-  updateHotelController
-);
+router.put('/updateHotel/:id', auth, upload.single('filename'), updateHotelController);
 router.delete('/deleteHotels/:id', auth, deleteHotelsController);
 
 router.get('/getBookingHistory', auth, sendBookingHistory);
 
+//count dashboard
 router.get('/getUserCount', auth, getUserCountController);
 router.get('/getBookHotelCount', auth, getBookHotelCountController);
 router.get('/getBookGroomingCount', auth, getBookGroomingCountController);
 
 //Booking Grooming
 router.get('/allBookedGrooming', auth, getAllbookingGroomingController);
-router.delete(
-  '/deleteBookedGrooming/:id',
-  auth,
-  deleteBookedGroomingController
-);
+router.delete('/deleteBookedGrooming/:id', auth, deleteBookedGroomingController);
 router.get('/editBookGrooming/:id', auth, editBookGroomingController);
 router.put('/updateBookGrooming/:id', auth, updateBookGroomingController);
 

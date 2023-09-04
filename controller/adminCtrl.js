@@ -4,6 +4,7 @@ const employeeModel = require('../models/employeeModel');
 const hotelModel = require('../models/hotelModel');
 const groomingModel = require('../models/groomingModel');
 const newsModel = require('../models/newsModel');
+const galleryModel = require('../models/galleryModel')
 const path = require('path');
 
 const getAllUsersController = async (req, res) => {
@@ -139,6 +140,117 @@ const deleteNewsController = async (req, res) => {
 const getNewsController = async (req, res) => {
   try {
     const detail = await newsModel.find({});
+    res.status(200).send({
+      success: true,
+      message: 'details data list',
+      data: detail,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: 'error while fetching details',
+      error,
+    });
+  }
+};
+//gall
+const createGallController = async (req, res) => {
+  try {
+    await galleryModel.create({
+      image: req.file.filename,
+    });
+    res.status(200).send({
+      success: true,
+      message: 'create image success',
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: 'create image error',
+      error,
+    });
+  }
+};
+
+const editGallController = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const gallery = await galleryModel.findById({ _id: id });
+
+    if (gallery) {
+      res.status(200).send({
+        success: true,
+        message: 'gallery image get successfully',
+        data: gallery,
+      });
+    } else {
+      res.status(404).send({
+        success: false,
+        message: 'image not found',
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: 'Error get gallery image',
+    });
+  }
+};
+
+const updateGallController = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    let updateFields = {};
+    if (req.file) {
+      updateFields.image = req.file.filename;
+    }
+    const updateGallery = await galleryModel.findByIdAndUpdate(
+      { _id: id },
+      updateFields,
+      { new: true }
+    );
+
+    res.status(200).send({
+      success: true,
+      message: 'Update image successfully',
+      data: updateGallery,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: 'Error updating gallery image',
+    });
+  }
+};
+
+const deleteGallController = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await galleryModel.findByIdAndDelete({ _id: userId });
+    res.status(200).send({
+      success: true,
+      message: 'Deleted image successfully',
+      data: user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: 'Error deleting image',
+      error,
+    });
+  }
+};
+
+const getGallController = async (req, res) => {
+  try {
+    const detail = await galleryModel.find({});
     res.status(200).send({
       success: true,
       message: 'details data list',
@@ -798,4 +910,9 @@ module.exports = {
   deleteNewsController,
   editNewsController,
   updateNewsController,
+  createGallController,
+  getGallController,
+  editGallController,
+  updateGallController,
+  deleteGallController,
 };
