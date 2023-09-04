@@ -154,7 +154,7 @@ const getNewsController = async (req, res) => {
     });
   }
 };
-//gall
+
 const createGallController = async (req, res) => {
   try {
     await galleryModel.create({

@@ -7,6 +7,7 @@ const groomingModel = require('../models/groomingModel');
 const contactModel = require('../models/contactModel');
 const employeeModel = require('../models/employeeModel');
 const newsModel = require('../models/newsModel');
+const galleryModel = require('../models/galleryModel')
 const moment = require('moment');
 const nodemailer = require('nodemailer');
 
@@ -92,11 +93,12 @@ const authController = async (req, res) => {
   }
 };
 
-const isTimeBooked = async (time, date) => {
+const isTimeBooked = async (time, date, grooming) => {
   try {
     const existingBooking = await groomingModel.findOne({
       time,
       date,
+      grooming,
     });
     return !!existingBooking;
   } catch (error) {
@@ -106,10 +108,10 @@ const isTimeBooked = async (time, date) => {
 };
 
 const isTimeBookedController = async (req, res) => {
-  const { time, date } = req.query;
+  const { time, date, grooming } = req.query;
 
   try {
-    const bookedTimeSlots = await isTimeBooked(time, date);
+    const bookedTimeSlots = await isTimeBooked(time, date, grooming);
     res.status(200).send({ bookedTimeSlots });
   } catch (error) {
     console.error(error);
@@ -120,8 +122,8 @@ const isTimeBookedController = async (req, res) => {
 const bookGroomingController = async (req, res) => {
   try {
     const userId = req.body.userId;
-    const { time, date } = req.body;
-    const isTimeAlreadyBooked = await isTimeBooked(time, date);
+    const { time, date, grooming } = req.body;
+    const isTimeAlreadyBooked = await isTimeBooked(time, date, grooming);
     if (isTimeAlreadyBooked) {
       res.status(400).send({
         success: false,
@@ -716,7 +718,24 @@ const getNewsController = async (req, res) => {
       message: 'Error to get News',
     });
   }
-};
+}; 
+
+const getGallController = async (req, res) => {
+  try {
+    const detail = await galleryModel.find();
+    res.status(200).send({
+      success: true,
+      message: 'details data list',
+      data: detail,
+    });
+  } catch (error) {
+    console.log(error);
+    res.send({
+      success: false,
+      message: 'error while fetching details',
+    });
+  }
+}; 
 
 module.exports = {
   loginController,
@@ -741,4 +760,5 @@ module.exports = {
   myBookingGroomingController,
   deleteBookedGroomingController,
   getNewsController,
+  getGallController,
 };

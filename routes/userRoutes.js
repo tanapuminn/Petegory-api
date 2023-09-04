@@ -21,6 +21,7 @@ const {
     myBookingGroomingController,
     deleteBookedGroomingController,
     getNewsController,
+    getGallController,
 } = require('../controller/userCtrl');
 const auth = require('../middlewares/auth');
 
@@ -48,8 +49,9 @@ router.post('/deleteNotification', auth, deleteAllNotiController)
 //get detail hotels
 router.get('/getDetailHotel', getDetailHotelController)
 
-//get detail news
+//get detail news && gallery
 router.get('/getNews', getNewsController)
+router.get('/getGall', getGallController);
 
 //get history booking
 router.get('/getMyBooking', auth, myBookingController)
