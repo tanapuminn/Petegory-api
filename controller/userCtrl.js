@@ -7,7 +7,7 @@ const groomingModel = require('../models/groomingModel');
 const contactModel = require('../models/contactModel');
 const employeeModel = require('../models/employeeModel');
 const newsModel = require('../models/newsModel');
-const galleryModel = require('../models/galleryModel')
+const galleryModel = require('../models/galleryModel');
 const moment = require('moment');
 const nodemailer = require('nodemailer');
 
@@ -152,7 +152,7 @@ const bookGroomingController = async (req, res) => {
       Add-on: ${newGrooming.addon}
       Breed: ${newGrooming.breed}
       Service: ${newGrooming.grooming}
-      Date: ${formatDate}
+      Date: ${newGrooming.date}
       Time: ${newGrooming.time}`,
       data: {
         groomingId: newGrooming._id,
@@ -176,7 +176,7 @@ const bookGroomingController = async (req, res) => {
           Add-on: ${newGrooming.addon}
           Breed: ${newGrooming.breed}
           Service: ${newGrooming.grooming}
-          Date: ${formatDate}
+          Date: ${newGrooming.date}
           Time: ${newGrooming.time}`,
           data: {
             groomingId: newGrooming._id,
@@ -717,7 +717,7 @@ const getNewsController = async (req, res) => {
       message: 'Error to get News',
     });
   }
-}; 
+};
 
 const getGallController = async (req, res) => {
   try {
@@ -734,7 +734,7 @@ const getGallController = async (req, res) => {
       message: 'error while fetching details',
     });
   }
-}; 
+};
 
 module.exports = {
   loginController,
