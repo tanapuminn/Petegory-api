@@ -93,12 +93,11 @@ const authController = async (req, res) => {
   }
 };
 
-const isTimeBooked = async (time, date, grooming) => {
+const isTimeBooked = async (time, date) => {
   try {
     const existingBooking = await groomingModel.findOne({
       time,
       date,
-      grooming,
     });
     return !!existingBooking;
   } catch (error) {
@@ -108,10 +107,10 @@ const isTimeBooked = async (time, date, grooming) => {
 };
 
 const isTimeBookedController = async (req, res) => {
-  const { time, date, grooming } = req.query;
+  const { time, date } = req.query;
 
   try {
-    const bookedTimeSlots = await isTimeBooked(time, date, grooming);
+    const bookedTimeSlots = await isTimeBooked(time, date);
     res.status(200).send({ bookedTimeSlots });
   } catch (error) {
     console.error(error);
