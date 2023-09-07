@@ -536,17 +536,17 @@ const changePasswordController = async (req, res) => {
 
     const passwordMatch = await bcrypt.compare(oldPassword, user.password);
     if (!passwordMatch) {
-      return res.status(401).json({ message: 'Incorrect old password' });
+      return res.status(401).send({ message: 'Incorrect old password', success: false });
     }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedNewPassword;
     await user.save();
 
-    res.status(200).json({ message: 'Password changed successfully' });
+    res.status(200).json({ message: 'Password changed successfully', success: true });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Can not change password' });
+    res.status(500).json({ message: 'Can not change password', success: false });
   }
 };
 
