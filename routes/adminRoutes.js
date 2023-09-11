@@ -62,6 +62,7 @@ const upload = multer({
   storage: storage,
 });
 
+//get user&employee
 router.get('/getAllUsers', auth, getAllUsersController);
 router.get('/getAllEmployees', auth, getAllEmployeeController);
 
@@ -86,6 +87,7 @@ router.get('/editHotel/:id', auth, editHotelController);
 router.put('/updateHotel/:id', auth, upload.single('filename'), updateHotelController);
 router.delete('/deleteHotels/:id', auth, deleteHotelsController);
 
+//all booking dashboard
 router.get('/getBookingHistory', auth, sendBookingHistory);
 
 //count dashboard

@@ -1,18 +1,18 @@
-const userModel = require('../models/userModels');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const hotelModel = require('../models/hotelModel');
-const hoteldetailModel = require('../models/hotelDetailModel');
-const groomingModel = require('../models/groomingModel');
-const contactModel = require('../models/contactModel');
-const employeeModel = require('../models/employeeModel');
-const newsModel = require('../models/newsModel');
-const galleryModel = require('../models/galleryModel');
-const moment = require('moment');
-const nodemailer = require('nodemailer');
+const userModel = require("../models/userModels");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const hotelModel = require("../models/hotelModel");
+const hoteldetailModel = require("../models/hotelDetailModel");
+const groomingModel = require("../models/groomingModel");
+const contactModel = require("../models/contactModel");
+const employeeModel = require("../models/employeeModel");
+const newsModel = require("../models/newsModel");
+const galleryModel = require("../models/galleryModel");
+const moment = require("moment");
+const nodemailer = require("nodemailer");
 
-const { notifyLine } = require('../Functions/Notify');
-const tokenLine = '5Ir6hjUjIQ6374TGO91Fv1DA7ewZlh5UQodcI8DU65N';
+const { notifyLine } = require("../Functions/Notify");
+const tokenLine = "5Ir6hjUjIQ6374TGO91Fv1DA7ewZlh5UQodcI8DU65N";
 
 const signupController = async (req, res) => {
   try {
@@ -20,7 +20,7 @@ const signupController = async (req, res) => {
     if (exisitingUser) {
       return res
         .status(200)
-        .send({ message: 'User Already Exist', success: false });
+        .send({ message: "User Already Exist", success: false });
     }
     const password = await req.body.password;
     const salt = await bcrypt.genSalt(10);
@@ -33,7 +33,7 @@ const signupController = async (req, res) => {
       password: hashedPassword,
     });
     await newUser.save();
-    res.status(201).send({ message: 'Register Successfully', success: true });
+    res.status(201).send({ message: "Register Successfully", success: true });
   } catch (error) {
     console.log(error);
     res.status(500).send({
@@ -49,19 +49,19 @@ const loginController = async (req, res) => {
     if (!user) {
       return res
         .status(200)
-        .send({ message: 'User Not Found', success: false });
+        .send({ message: "User Not Found", success: false });
     }
     const isMatch = await bcrypt.compare(req.body.password, user.password);
     if (!isMatch) {
       return res
         .status(200)
-        .send({ message: 'Invalid Email or Password', success: false });
+        .send({ message: "Invalid Email or Password", success: false });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1d',
+      expiresIn: "1d",
     });
 
-    res.status(200).send({ message: 'Login Success', success: true, token });
+    res.status(200).send({ message: "Login Success", success: true, token });
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: `Error in Login CTRL ${error.message}` });
@@ -74,7 +74,7 @@ const authController = async (req, res) => {
     user.password = undefined;
     if (!user) {
       return res.status(200).send({
-        message: 'user not found',
+        message: "user not found",
         success: false,
       });
     } else {
@@ -86,7 +86,7 @@ const authController = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send({
-      message: 'auth error',
+      message: "auth error",
       success: false,
       error,
     });
@@ -114,7 +114,7 @@ const isTimeBookedController = async (req, res) => {
     res.status(200).send({ bookedTimeSlots });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'An error occurred' });
+    res.status(500).json({ error: "An error occurred" });
   }
 };
 
@@ -126,7 +126,7 @@ const bookGroomingController = async (req, res) => {
     if (isTimeAlreadyBooked) {
       res.status(400).send({
         success: false,
-        message: 'This time slot is already booked.',
+        message: "This time slot is already booked.",
       });
       return;
     }
@@ -134,17 +134,17 @@ const bookGroomingController = async (req, res) => {
     const newGrooming = await groomingModel({
       ...req.body,
       userId: userId,
-      status: 'pending',
+      status: "pending",
       // date: moment(date, 'DD-MM-YYYY').format('DD-MM-YYYY'),
     });
     await newGrooming.save();
 
     const adminUser = await userModel.findOne({ isAdmin: true });
     const employeeUsers = await userModel.find({ isEmployee: true });
-    const formatDate = moment(newGrooming.date).format('DD-MM-YYYY');
+    const formatDate = moment(newGrooming.date).format("DD-MM-YYYY");
 
     const notificationAdmin = {
-      type: 'grooming-booking-request',
+      type: "grooming-booking-request",
       message: `มีการจองอาบน้ำ-ตัดขน
       Name: ${newGrooming.Name}
       Petname: ${newGrooming.PetName}
@@ -157,18 +157,18 @@ const bookGroomingController = async (req, res) => {
       data: {
         groomingId: newGrooming._id,
         name: newGrooming.PetName,
-        onClickPath: '/admin/dashboard/grooming',
+        onClickPath: "/admin/dashboard/grooming",
       },
     };
     adminUser.notification.push(notificationAdmin);
     await adminUser.save();
 
     if (!employeeUsers) {
-      console.log('Employee user not found.');
+      console.log("Employee user not found.");
     } else {
       for (const employeeUser of employeeUsers) {
         const notificationEmployee = {
-          type: 'grooming-booking-request',
+          type: "grooming-booking-request",
           message: `มีการจองอาบน้ำ-ตัดขน
           Name: ${newGrooming.Name}
           Petname: ${newGrooming.PetName}
@@ -181,13 +181,13 @@ const bookGroomingController = async (req, res) => {
           data: {
             groomingId: newGrooming._id,
             name: newGrooming.PetName,
-            onClickPath: '/admin/dashboard/grooming',
+            onClickPath: "/admin/dashboard/grooming",
           },
         };
 
         employeeUser.notification.push(notificationEmployee);
         await employeeUser.save();
-        console.log('Employee user found:', employeeUsers);
+        console.log("Employee user found:", employeeUsers);
       }
     }
 
@@ -198,7 +198,7 @@ const bookGroomingController = async (req, res) => {
     );
     res.status(201).send({
       success: true,
-      message: 'Grooming Booking Successfully',
+      message: "Grooming Booking Successfully",
     });
     //notify
     const text = notificationAdmin.message;
@@ -208,7 +208,7 @@ const bookGroomingController = async (req, res) => {
     res.status(500).send({
       success: false,
       error,
-      message: 'Error Booking for Grooming',
+      message: "Error Booking for Grooming",
     });
   }
 };
@@ -253,7 +253,7 @@ const isRoomBookedController = async (req, res) => {
     res.status(200).json({ isBooked });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'An error occurred' });
+    res.status(500).json({ error: "An error occurred" });
   }
 };
 
@@ -271,14 +271,14 @@ const bookHotelController = async (req, res) => {
     ) {
       return res.status(400).send({
         success: false,
-        message: 'This room is already booked.',
+        message: "This room is already booked.",
       });
     }
 
     const newHotel = await hotelModel({
       ...req.body,
       userId: userId,
-      status: 'pending',
+      status: "pending",
     });
     await newHotel.save();
 
@@ -286,7 +286,7 @@ const bookHotelController = async (req, res) => {
     const employeeUsers = await userModel.find({ isEmployee: true });
 
     const notificationAdmin = {
-      type: 'hotel-booking-request',
+      type: "hotel-booking-request",
       message: `มีการจองโรงแรมแมว
       Name: ${newHotel.Name}
       Petname: ${newHotel.PetName}
@@ -296,8 +296,8 @@ const bookHotelController = async (req, res) => {
       Check-in Time: ${newHotel.time} `,
       data: {
         hotelId: newHotel._id,
-        name: newHotel.name + ' ' + newHotel.PetName,
-        onClickPath: '/admin/dashboard/hotel',
+        name: newHotel.name + " " + newHotel.PetName,
+        onClickPath: "/admin/dashboard/hotel",
       },
     };
 
@@ -305,11 +305,11 @@ const bookHotelController = async (req, res) => {
     await adminUser.save();
 
     if (!employeeUsers) {
-      console.log('Employee user not found.');
+      console.log("Employee user not found.");
     } else {
       for (const employeeUser of employeeUsers) {
         const notificationEmployee = {
-          type: 'hotel-booking-request',
+          type: "hotel-booking-request",
           message: `มีการจองโรงแรมแมว
           Name: ${newHotel.Name}
           Petname: ${newHotel.PetName}
@@ -319,14 +319,14 @@ const bookHotelController = async (req, res) => {
           Check-in Time: ${newHotel.time} `,
           data: {
             hotelId: newHotel._id,
-            name: newHotel.name + ' ' + newHotel.PetName,
-            onClickPath: '/admin/dashboard/hotel',
+            name: newHotel.name + " " + newHotel.PetName,
+            onClickPath: "/admin/dashboard/hotel",
           },
         };
 
         employeeUser.notification.push(notificationEmployee);
         await employeeUser.save();
-        console.log('Employee user found:', employeeUsers);
+        console.log("Employee user found:", employeeUsers);
       }
     }
 
@@ -335,18 +335,13 @@ const bookHotelController = async (req, res) => {
       { _id: adminUser._id },
       { $push: { notification: notificationAdmin } }
     );
-    // Update notification for employee
-    // await userModel.findByIdAndUpdate(
-    //   { _id: employeeUsers._id },
-    //   { $push: { notification: notificationEmployee } }
-    // );
 
     res.status(201).send({
       success: true,
-      message: 'Cat Hotel Booking Successfully',
+      message: "Cat Hotel Booking Successfully",
     });
 
-    //notify
+    //notify line
     const text = notificationAdmin.message;
     await notifyLine(tokenLine, text);
   } catch (error) {
@@ -355,14 +350,14 @@ const bookHotelController = async (req, res) => {
     if (error.code === 11000) {
       return res.status(400).send({
         success: false,
-        message: 'This room is already booked.',
+        message: "This room is already booked.",
       });
     }
     //
     res.status(500).send({
       success: false,
       error,
-      message: 'Error Booking for Hotel',
+      message: "Error Booking for Hotel",
     });
   }
 };
@@ -383,13 +378,13 @@ const getAllNotiController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: 'all notification marked as read',
+      message: "all notification marked as read",
       data: updatedUser,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
-      message: 'Error in notification',
+      message: "Error in notification",
       success: false,
       error,
     });
@@ -405,14 +400,14 @@ const deleteAllNotiController = async (req, res) => {
     updatedUser.password = undefined;
     res.status(200).send({
       success: true,
-      message: 'Notifications Deleted Successfully',
+      message: "Notifications Deleted Successfully",
       data: updatedUser,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: 'unable to delete all notifications',
+      message: "unable to delete all notifications",
       error,
     });
   }
@@ -423,14 +418,14 @@ const getDetailHotelController = async (req, res) => {
     const detail = await hoteldetailModel.find({});
     res.status(200).send({
       success: true,
-      message: 'details data list',
+      message: "details data list",
       data: detail,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: 'error while fetching details',
+      message: "error while fetching details",
       error,
     });
   }
@@ -442,14 +437,14 @@ const myBookingController = async (req, res) => {
     const userBookings = await hotelModel.find({ userId: loggedInUserId });
     res.status(200).send({
       success: true,
-      message: 'details booking list',
+      message: "details booking list",
       data: userBookings,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: 'error while fetching details',
+      message: "error while fetching details",
       error,
     });
   }
@@ -462,19 +457,19 @@ const deleteBookingHotelController = async (req, res) => {
     if (!deletedBooking) {
       return res.status(404).send({
         success: false,
-        message: 'Booking not found',
+        message: "Booking not found",
       });
     }
     res.status(200).send({
       success: true,
-      message: 'Booking deleted successfully',
+      message: "Booking deleted successfully",
       data: deletedBooking,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: 'Error deleting booking',
+      message: "Error deleting booking",
       error,
     });
   }
@@ -486,14 +481,14 @@ const myBookingGroomingController = async (req, res) => {
     const userBookings = await groomingModel.find({ userId: loggedInUserId });
     res.status(200).send({
       success: true,
-      message: 'details booking list',
+      message: "details booking list",
       data: userBookings,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: 'error while fetching details',
+      message: "error while fetching details",
       error,
     });
   }
@@ -506,19 +501,19 @@ const deleteBookedGroomingController = async (req, res) => {
     if (!deletedBooking) {
       return res.status(404).send({
         success: false,
-        message: 'Booking not found',
+        message: "Booking not found",
       });
     }
     res.status(200).send({
       success: true,
-      message: 'Booking deleted successfully',
+      message: "Booking deleted successfully",
       data: deletedBooking,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: 'Error deleting booking',
+      message: "Error deleting booking",
       error,
     });
   }
@@ -531,22 +526,28 @@ const changePasswordController = async (req, res) => {
   try {
     const user = await userModel.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     const passwordMatch = await bcrypt.compare(oldPassword, user.password);
     if (!passwordMatch) {
-      return res.status(401).send({ message: 'Incorrect old password', success: false });
+      return res
+        .status(401)
+        .send({ message: "Incorrect old password", success: false });
     }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedNewPassword;
     await user.save();
 
-    res.status(200).json({ message: 'Password changed successfully', success: true });
+    res
+      .status(200)
+      .json({ message: "Password changed successfully", success: true });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: 'Can not change password', success: false });
+    res
+      .status(500)
+      .json({ message: "Can not change password", success: false });
   }
 };
 
@@ -554,42 +555,42 @@ const forgotPasswordController = async (req, res) => {
   const { email } = req.body;
   await userModel
     .findOne({ email })
-    .then(user => {
+    .then((user) => {
       if (!user) {
-        return res.send({ message: 'User not existed' });
+        return res.send({ message: "User not existed" });
       }
-      const token = jwt.sign({ id: user._id }, 'jwt_secret_key', {
-        expiresIn: '1d',
+      const token = jwt.sign({ id: user._id }, "jwt_secret_key", {
+        expiresIn: "1d",
       });
       var transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: "gmail",
         secure: true,
         auth: {
-          user: 'tanapumin.fo@gmail.com',
-          pass: 'umvsulynvqfehyde',
+          user: "tanapumin.fo@gmail.com",
+          pass: "umvsulynvqfehyde",
         },
       });
 
       var mailOptions = {
-        from: 'tanapumin.fo@gmail.com',
+        from: "tanapumin.fo@gmail.com",
         to: email,
-        subject: 'Reset Password Link',
+        subject: "Reset Password Link",
         text: `http://localhost:3000/reset-password/${user._id}/${token}`,
       };
 
       transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-          console.log('Email send error:', error);
+          console.log("Email send error:", error);
         } else {
-          console.log('Email sent:', info.response);
+          console.log("Email sent:", info.response);
           return res.send({ success: true });
         }
       });
       return res.send({ success: true });
     })
-    .catch(error => {
+    .catch((error) => {
       console.log(error);
-      return res.send({ message: 'An error occurred' });
+      return res.send({ message: "An error occurred" });
     });
 };
 
@@ -597,30 +598,30 @@ const resetPasswordController = (req, res) => {
   const { id, token } = req.params;
   const { password } = req.body;
 
-  jwt.verify(token, 'jwt_secret_key', (err, decode) => {
+  jwt.verify(token, "jwt_secret_key", (err, decode) => {
     if (err) {
       return res.send({
         success: false,
-        message: 'Error with token',
+        message: "Error with token",
       });
     } else {
       bcrypt
         .hash(password, 10)
-        .then(hash => {
+        .then((hash) => {
           userModel
             .findByIdAndUpdate({ _id: id }, { password: hash })
-            .then(u => res.send({ success: true }))
-            .catch(err =>
+            .then((u) => res.send({ success: true }))
+            .catch((err) =>
               res.send({
                 success: false,
-                message: 'Hash Error',
+                message: "Hash Error",
               })
             );
         })
-        .catch(err =>
+        .catch((err) =>
           res.send({
             success: false,
-            message: 'Error to hash reset',
+            message: "Error to hash reset",
           })
         );
     }
@@ -632,14 +633,14 @@ const getUserProfileController = async (req, res) => {
     const user = await userModel.findById({ _id: req.body.userId });
     res.status(200).send({
       success: true,
-      message: 'get user detail',
+      message: "get user detail",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: 'get user error',
+      message: "get user error",
     });
   }
 };
@@ -653,52 +654,50 @@ const userEditController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      message: 'updated success',
+      message: "updated success",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.send({
       success: false,
-      message: 'Error to updated',
+      message: "Error to updated",
     });
   }
 };
 
 const sendContactController = async (req, res) => {
-  // const { email } = req.body;
   const { name, email, message } = req.body;
   try {
-    // await userModel.findOne({ email });
     const contact = await contactModel.create({ name, email, message });
     var transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       secure: true,
       auth: {
-        user: 'tanapumin.fo@gmail.com',
-        pass: 'umvsulynvqfehyde',
+        user: "tanapumin.fo@gmail.com",
+        pass: "umvsulynvqfehyde",
       },
     });
 
     var mailOptions = {
       from: email,
-      to: 'tanapumin.fo@gmail.com',
-      subject: 'Contact from petegory website',
-      text: email + '\n' + 'จาก ' + name + '\n' + message,
+      to: "tanapumin.fo@gmail.com",
+      subject: "Contact from petegory website",
+      text: email + "\n" + "จาก " + name + "\n" + message,
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
-        console.log('Email send error:', error);
+        console.log("Email send error:", error);
       } else {
-        console.log('Email sent:', info.response);
+        console.log("Email sent:", info.response);
         return res.send({ success: true, data: contact });
       }
     });
     return res.send({ success: true });
   } catch (error) {
     console.log(error);
-    return res.send({ message: 'An error occurred' });
+    return res.send({ message: "An error occurred" });
   }
 };
 
@@ -707,14 +706,14 @@ const getNewsController = async (req, res) => {
     const news = await newsModel.find();
     res.status(200).send({
       success: true,
-      message: 'get news success',
+      message: "get news success",
       data: news,
     });
   } catch (error) {
     console.log(error);
     res.send({
       success: false,
-      message: 'Error to get News',
+      message: "Error to get News",
     });
   }
 };
@@ -724,14 +723,14 @@ const getGallController = async (req, res) => {
     const detail = await galleryModel.find();
     res.status(200).send({
       success: true,
-      message: 'details data list',
+      message: "details data list",
       data: detail,
     });
   } catch (error) {
     console.log(error);
     res.send({
       success: false,
-      message: 'error while fetching details',
+      message: "error while fetching details",
     });
   }
 };

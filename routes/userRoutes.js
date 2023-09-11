@@ -32,6 +32,7 @@ router.post('/login', loginController)
 
 router.post('/signup', signupController)
 
+//auth user
 router.post('/getUserData', auth, authController)
 
 //Booking Hotel
