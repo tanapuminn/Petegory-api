@@ -531,23 +531,17 @@ const changePasswordController = async (req, res) => {
 
     const passwordMatch = await bcrypt.compare(oldPassword, user.password);
     if (!passwordMatch) {
-      return res
-        .status(401)
-        .send({ message: "รหัสผ่านเก่าไม่ถูกต้อง", success: false });
+      return res.status(401).send({ message: "รหัสผ่านเก่าไม่ถูกต้อง", success: false });
     }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedNewPassword;
     await user.save();
 
-    res
-      .status(200)
-      .json({ message: "เปลี่ยนรหัสผ่านสำเร็จ", success: true });
+    res.status(200).send({ message: "Password changed successfully", success: true });
   } catch (error) {
     console.log(error);
-    res
-      .status(500)
-      .json({ message: "ไม่สามารถเปลี่ยนรหัสผ่านได้", success: false });
+    res.status(500).swnd({ message: "ไม่สามารถเปลี่ยนรหัสผ่านได้", success: false });
   }
 };
 

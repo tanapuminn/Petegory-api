@@ -51,6 +51,10 @@ const hotelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    petinfo: {
+      type: String,
+      required: true,
+    }
   },
   { timestamps: true }
 );
