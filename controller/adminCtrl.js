@@ -12,14 +12,14 @@ const getAllUsersController = async (req, res) => {
     const users = await userModel.find({ isAdmin: false, isEmployee: false });
     res.status(200).send({
       success: true,
-      message: "users data list",
+      message: "รายชื่อผู้ใช้",
       data: users,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching users",
+      message: "ไม่พบข้อมูล",
       error,
     });
   }
@@ -30,14 +30,14 @@ const getAllEmployeeController = async (req, res) => {
     const employees = await userModel.find({ isEmployee: true });
     res.status(200).send({
       success: true,
-      message: "employees data list",
+      message: "รายชื่อพนักงาน",
       data: employees,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching users",
+      message: "ไม่พบข้อมูล",
       error,
     });
   }
@@ -50,13 +50,13 @@ const createNewsController = async (req, res) => {
     });
     res.status(200).send({
       success: true,
-      message: "create news success",
+      message: "เพิ่มข้อมูลสำเร็จ",
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "create news error",
+      message: "เพิ่มข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -71,20 +71,20 @@ const editNewsController = async (req, res) => {
     if (news) {
       res.status(200).send({
         success: true,
-        message: "News data get successfully",
+        message: "ดึงข้อมูลสำเร็จ",
         data: news,
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "News not found",
+        message: "ไม่พบข้อมูล",
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error get news data",
+      message: "ดึงข้อมูลผิดพลาด",
     });
   }
 };
@@ -92,7 +92,6 @@ const editNewsController = async (req, res) => {
 const updateNewsController = async (req, res) => {
   try {
     const id = req.params.id;
-    // const { type, price, title1, title2, title3, title4, title5 } = req.body;
 
     let updateFields = {};
     if (req.file) {
@@ -106,14 +105,14 @@ const updateNewsController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: "Update news successfully",
+      message: "แก้ไขข้อมูลสำเร็จ",
       data: updateNews,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error updating news data",
+      message: "แก้ไขข้อมูลไม่สำเร็จ",
     });
   }
 };
@@ -124,14 +123,14 @@ const deleteNewsController = async (req, res) => {
     const user = await newsModel.findByIdAndDelete({ _id: userId });
     res.status(200).send({
       success: true,
-      message: "Deleted News successfully",
+      message: "ลบข้อมูลสำเร็จ",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error deleting News",
+      message: "ลบข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -142,14 +141,14 @@ const getNewsController = async (req, res) => {
     const detail = await newsModel.find({});
     res.status(200).send({
       success: true,
-      message: "details data list",
+      message: "ข่าวสารทั้งหมด",
       data: detail,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: "ไม่พบข้อมูล",
       error,
     });
   }
@@ -162,13 +161,13 @@ const createGallController = async (req, res) => {
     });
     res.status(200).send({
       success: true,
-      message: "create image success",
+      message: "เพิ่มข้อมูลสำเร็จ",
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "create image error",
+      message: "เพิ่มข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -183,20 +182,20 @@ const editGallController = async (req, res) => {
     if (gallery) {
       res.status(200).send({
         success: true,
-        message: "gallery image get successfully",
+        message: "ดึงข้อมูลรูปภาพสำเร็จ",
         data: gallery,
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "image not found",
+        message: "ไม่พบข้อมูล",
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error get gallery image",
+      message: "ดึงข้อมูลรูปภาพไม่สำเร็จ",
     });
   }
 };
@@ -217,14 +216,14 @@ const updateGallController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: "Update image successfully",
+      message: "แก้ไขข้อมูลสำเร็จ",
       data: updateGallery,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error updating gallery image",
+      message: "แก้ไขข้อมูลไม่สำเร็จ",
     });
   }
 };
@@ -235,14 +234,14 @@ const deleteGallController = async (req, res) => {
     const user = await galleryModel.findByIdAndDelete({ _id: userId });
     res.status(200).send({
       success: true,
-      message: "Deleted image successfully",
+      message: "ลบข้อมูลสำเร็จ",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error deleting image",
+      message: "ลบข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -253,14 +252,14 @@ const getGallController = async (req, res) => {
     const detail = await galleryModel.find({});
     res.status(200).send({
       success: true,
-      message: "details data list",
+      message: "ดึงข้อมูลสำเร็จ",
       data: detail,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: "ดึงข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -280,13 +279,13 @@ const createHotelController = async (req, res) => {
     });
     res.status(200).send({
       success: true,
-      message: "create detail success",
+      message: "เพิ่มข้อมูลสำเร็จ",
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "create details error",
+      message: "เพิ่มข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -297,14 +296,14 @@ const getHotelController = async (req, res) => {
     const detail = await hotelDetailModel.find({});
     res.status(200).send({
       success: true,
-      message: "details data list",
+      message: "ข้อมูลโรงแรมทั้งหมด",
       data: detail,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: "ดึงข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -319,20 +318,20 @@ const editHotelController = async (req, res) => {
     if (hotel) {
       res.status(200).send({
         success: true,
-        message: "Hotel data get successfully",
+        message: "ดึงข้อมูลสำเร็จ",
         data: hotel,
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "Hotel not found",
+        message: "ไม่พบข้อมูล",
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error get hotel data",
+      message: "ดึงข้อมูลไม่สำเร็จ",
     });
   }
 };
@@ -362,14 +361,14 @@ const updateHotelController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: "Update hotel successfully",
+      message: "แก้ไขข้อมูลสำเร็จ",
       data: updateHotel,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error updating hotel data",
+      message: "แก้ไขข้อมูลไม่สำเร็จ",
     });
   }
 };
@@ -380,14 +379,14 @@ const deleteHotelsController = async (req, res) => {
     const user = await hotelDetailModel.findByIdAndDelete({ _id: userId });
     res.status(200).send({
       success: true,
-      message: "Deleted Hotel successfully",
+      message: "ลบข้อมูลสำเร็จ",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error deleting Hotel",
+      message: "ลบข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -401,14 +400,14 @@ const getUserCountController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: "users total list",
+      message: "จำนวนผู้ใช้ทั้งหมด",
       data: userCount,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: "ดึงข้อมูลผู้ใช้ไม่สำเร็จ",
       error,
     });
   }
@@ -420,14 +419,14 @@ const getBookHotelCountController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: "Hotel Booking total list",
+      message: "จำนวนการจองโรงแรมทั้งหมด",
       data: BookingHotelCount,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: "ดึงข้อมูลการจองโรงแรมไม่สำเร็จ",
       error,
     });
   }
@@ -439,14 +438,14 @@ const getBookGroomingCountController = async (req, res) => {
 
     res.status(200).send({
       success: true,
-      message: "Grooming Booking total list",
+      message: "จำนวนการจอง grooming ทั้งหมด",
       data: BookingGroomingCount,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: "ดึงข้อมูลการจอง grooming ไม่สำเร็จ",
       error,
     });
   }
@@ -459,7 +458,7 @@ const changeStatusController = async (req, res) => {
     if (!user) {
       return res.status(404).send({
         success: false,
-        message: "User not found",
+        message: "ไม่พบผู้ใช้",
       });
     }
     if (isEmployee) {
@@ -469,14 +468,14 @@ const changeStatusController = async (req, res) => {
 
     res.status(201).send({
       success: true,
-      message: "Account Status Updated",
+      message: "เปลี่ยนสถานะผู้ใช้แล้ว",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error in Account Status",
+      message: "เปลี่ยนสถานะไม่สำเร็จ",
       error,
     });
   }
@@ -490,7 +489,7 @@ const statusBookHotelController = async (req, res) => {
     if (!bookHotel) {
       return res.status(404).send({
         success: false,
-        message: "Hotel booking not found.",
+        message: "ไม่พบข้อมูลการจอง",
       });
     }
 
@@ -501,20 +500,20 @@ const statusBookHotelController = async (req, res) => {
 
       res.status(201).send({
         success: true,
-        message: "Status is Updated",
+        message: "แก้ไขสถานะแล้ว",
         data: bookHotel,
       });
     } else {
       res.status(400).send({
         success: false,
-        message: "Invalid status update.",
+        message: "สถานะไม่ถูกแก้ไข",
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error in Update Status",
+      message: "แก้ไขสถานะไม่สำเร็จ",
       error,
     });
   }
@@ -527,7 +526,7 @@ const statusBookGroomingController = async (req, res) => {
     if (!bookGrooming) {
       return res.status(404).send({
         success: false,
-        message: "Frooming booking not found.",
+        message: "ไม่พบข้อมูล",
       });
     }
 
@@ -538,20 +537,20 @@ const statusBookGroomingController = async (req, res) => {
 
       res.status(201).send({
         success: true,
-        message: "Status is Updated",
+        message: "แก้ไขสถานะแล้ว",
         data: bookGrooming,
       });
     } else {
       res.status(400).send({
         success: false,
-        message: "Invalid status update.",
+        message: "สถานะไม่ถูกแก้ไข",
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error in Update Status",
+      message: "แก้ไขสถานะไม่สำเร็จ",
       error,
     });
   }
@@ -566,20 +565,20 @@ const editUserController = async (req, res) => {
     if (user) {
       res.status(200).send({
         success: true,
-        message: "User data get successfully",
+        message: "ดึงข้อมูลผู้ใช้สำเร็จ",
         data: user,
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "User not found",
+        message: "ไม่พบผู้ใช้",
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error get user data",
+      message: "ดึงข้อมูลผู้ใช้ไม่สำเร็จ",
     });
   }
 };
@@ -594,14 +593,14 @@ const updateUserController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      message: "Update user successfully",
+      message: "แก้ไขข้อมูลผู้ใช้สำเร็จ",
       data: updateUser,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error updating user data",
+      message: "แก้ไขข้อมูลผู้ใช้ไม่สำเร็จ",
     });
   }
 };
@@ -612,14 +611,14 @@ const deleteUserController = async (req, res) => {
     const user = await userModel.findByIdAndDelete({ _id: id });
     res.status(200).send({
       success: true,
-      message: "User deleted successfully",
+      message: "ลบข้อมูลผู้ใช้สำเร็จ",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error deleting user",
+      message: "ลบข้อมูลผู้ใช้ไม่สำเร็จ",
       error,
     });
   }
@@ -634,20 +633,20 @@ const editEmployeeController = async (req, res) => {
     if (user) {
       res.status(200).send({
         success: true,
-        message: "Employee data get successfully",
+        message: "ดึงข้อมูลพนักงานสำเร็จ",
         data: user,
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "Employee not found",
+        message: "ไม่พบข้อมูลพนักงาน",
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error get Employee data",
+      message: "ดึงข้อมูลพนักงานไม่สำเร็จ",
     });
   }
 };
@@ -662,14 +661,14 @@ const updateEmployeeController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      message: "Update Employee successfully",
+      message: "แก้ไขข้อมูลสำเร็จ",
       data: updateUser,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error updating Employee data",
+      message: "แก้ไขข้อมูลไม่สำเร็จ",
     });
   }
 };
@@ -679,14 +678,14 @@ const getAllbookingHotelsController = async (req, res) => {
     user.sort((a, b) => b.createdAt - a.createdAt);
     res.status(200).send({
       success: true,
-      message: "all details booking list",
+      message: "ประวัติการจองโรงแรมทั้งหมด",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: "ไม่พบข้อมูล",
       error,
     });
   }
@@ -695,7 +694,6 @@ const getAllbookingHotelsController = async (req, res) => {
 const editBookHotelController = async (req, res) => {
   try {
     const userId = req.params.id;
-    // const user = {userId}
 
     const user = await hotelModel.findOne(
       { _id: userId },
@@ -705,20 +703,20 @@ const editBookHotelController = async (req, res) => {
     if (user) {
       res.status(200).send({
         success: true,
-        message: "User Booked get successfully",
+        message: "ดึงข้อมูลสำเร็จ",
         data: user,
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "User Booked not found",
+        message: "ไม่พบข้อมูล",
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error get User Booked",
+      message: "ดึงข้อมูลไม่สำเร็จ",
     });
   }
 };
@@ -733,14 +731,14 @@ const updateBookHotelController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      message: "Update User Booked successfully",
+      message: "แก้ไขข้อมูลสำเร็จ",
       data: updateUser,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error updating User Booked",
+      message: "แก้ไขข้อมูลไม่สำเร็จ",
     });
   }
 };
@@ -751,14 +749,14 @@ const deleteBookHotelController = async (req, res) => {
     const user = await hotelModel.findByIdAndDelete({ _id: userId });
     res.status(200).send({
       success: true,
-      message: "Booked Hotel deleted successfully",
+      message: "ลบข้อมูลสำเร็จ",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error deleting Booked Hotel",
+      message: "ลบข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -770,14 +768,14 @@ const getAllbookingGroomingController = async (req, res) => {
     user.sort((a, b) => b.createdAt - a.createdAt);
     res.status(200).send({
       success: true,
-      message: "all details booking list",
+      message: "ดึงข้อมูลสำเร็จ",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "error while fetching details",
+      message: "ดึงข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -785,7 +783,6 @@ const getAllbookingGroomingController = async (req, res) => {
 const editBookGroomingController = async (req, res) => {
   try {
     const userId = req.params.id;
-    // const user = {userId}
 
     const user = await groomingModel.findOne(
       { _id: userId },
@@ -795,20 +792,20 @@ const editBookGroomingController = async (req, res) => {
     if (user) {
       res.status(200).send({
         success: true,
-        message: "User Booked get successfully",
+        message: "ดึงข้อมูลสำเร็จ",
         data: user,
       });
     } else {
       res.status(404).send({
         success: false,
-        message: "User Booked not found",
+        message: "ไม่พบข้อมูล",
       });
     }
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error get User Booked",
+      message: "ดึงข้อมูลไม่สำเร็จ",
     });
   }
 };
@@ -823,14 +820,14 @@ const updateBookGroomingController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      message: "Update User Booked successfully",
+      message: "แก้ไขข้อมูลสำเร็จ",
       data: updateUser,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error updating User Booked",
+      message: "แก้ไขข้อมูลไม่สำเร็จ",
     });
   }
 };
@@ -840,14 +837,14 @@ const deleteBookedGroomingController = async (req, res) => {
     const user = await groomingModel.findByIdAndDelete({ _id: userId });
     res.status(200).send({
       success: true,
-      message: "Booked Grooming deleted successfully",
+      message: "ลบข้อมูลสำเร็จ",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error deleting Booked Grooming",
+      message: "ลบข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -873,7 +870,7 @@ const sendBookingHistory = async (req, res) => {
     return res.status(200).send({ success: true, data: bookingHistory });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({ success: false, error: "An error occurred" });
+    return res.status(500).send({ success: false, error: "พบข้อผิดพลาด" });
   }
 };
 

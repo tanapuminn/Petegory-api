@@ -20,7 +20,7 @@ const signupController = async (req, res) => {
     if (exisitingUser) {
       return res
         .status(200)
-        .send({ message: "User Already Exist", success: false });
+        .send({ message: "มีผู้ใช้นี้แล้ว", success: false });
     }
     const password = await req.body.password;
     const salt = await bcrypt.genSalt(10);
@@ -49,13 +49,13 @@ const loginController = async (req, res) => {
     if (!user) {
       return res
         .status(200)
-        .send({ message: "User Not Found", success: false });
+        .send({ message: "ไม่พบผู้ใช้", success: false });
     }
     const isMatch = await bcrypt.compare(req.body.password, user.password);
     if (!isMatch) {
       return res
         .status(200)
-        .send({ message: "Invalid Email or Password", success: false });
+        .send({ message: "รหัสผ่านไม่ถูกต้อง", success: false });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
@@ -74,7 +74,7 @@ const authController = async (req, res) => {
     user.password = undefined;
     if (!user) {
       return res.status(200).send({
-        message: "user not found",
+        message: "ไม่พบผู้ใช้",
         success: false,
       });
     } else {
@@ -114,7 +114,7 @@ const isTimeBookedController = async (req, res) => {
     res.status(200).send({ bookedTimeSlots });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred" });
+    res.status(500).json({ error: "เกิดข้อผิดพลาด" });
   }
 };
 
@@ -126,7 +126,7 @@ const bookGroomingController = async (req, res) => {
     if (isTimeAlreadyBooked) {
       res.status(400).send({
         success: false,
-        message: "This time slot is already booked.",
+        message: "เวลานี้ถูกจองแล้ว",
       });
       return;
     }
@@ -198,7 +198,7 @@ const bookGroomingController = async (req, res) => {
     );
     res.status(201).send({
       success: true,
-      message: "Grooming Booking Successfully",
+      message: "จองสำเร็จแล้ว",
     });
     //notify
     const text = notificationAdmin.message;
@@ -208,7 +208,7 @@ const bookGroomingController = async (req, res) => {
     res.status(500).send({
       success: false,
       error,
-      message: "Error Booking for Grooming",
+      message: "ไม่สามารถจองได้",
     });
   }
 };
@@ -253,7 +253,7 @@ const isRoomBookedController = async (req, res) => {
     res.status(200).json({ isBooked });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "An error occurred" });
+    res.status(500).json({ error: "เกิดข้อผิดพลาด" });
   }
 };
 
@@ -271,7 +271,7 @@ const bookHotelController = async (req, res) => {
     ) {
       return res.status(400).send({
         success: false,
-        message: "This room is already booked.",
+        message: "ห้องนี้ถูกจองแล้ว",
       });
     }
 
@@ -338,7 +338,7 @@ const bookHotelController = async (req, res) => {
 
     res.status(201).send({
       success: true,
-      message: "Cat Hotel Booking Successfully",
+      message: "จองสำเร็จแล้ว",
     });
 
     //notify line
@@ -350,14 +350,14 @@ const bookHotelController = async (req, res) => {
     if (error.code === 11000) {
       return res.status(400).send({
         success: false,
-        message: "This room is already booked.",
+        message: "ห้องนี้ถูกจองแล้ว",
       });
     }
     //
     res.status(500).send({
       success: false,
       error,
-      message: "Error Booking for Hotel",
+      message: "ไม่สามารถจองได้",
     });
   }
 };
@@ -462,14 +462,14 @@ const deleteBookingHotelController = async (req, res) => {
     }
     res.status(200).send({
       success: true,
-      message: "Booking deleted successfully",
+      message: "ลบข้อมูลสำเร็จ",
       data: deletedBooking,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error deleting booking",
+      message: "ลบข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -506,14 +506,14 @@ const deleteBookedGroomingController = async (req, res) => {
     }
     res.status(200).send({
       success: true,
-      message: "Booking deleted successfully",
+      message: "ลบข้อมูลสำเร็จ",
       data: deletedBooking,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error deleting booking",
+      message: "ลบข้อมูลไม่สำเร็จ",
       error,
     });
   }
@@ -526,14 +526,14 @@ const changePasswordController = async (req, res) => {
   try {
     const user = await userModel.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "ไม่พบผู้ใช้" });
     }
 
     const passwordMatch = await bcrypt.compare(oldPassword, user.password);
     if (!passwordMatch) {
       return res
         .status(401)
-        .send({ message: "Incorrect old password", success: false });
+        .send({ message: "รหัสผ่านเก่าไม่ถูกต้อง", success: false });
     }
 
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
@@ -542,12 +542,12 @@ const changePasswordController = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Password changed successfully", success: true });
+      .json({ message: "เปลี่ยนรหัสผ่านสำเร็จ", success: true });
   } catch (error) {
     console.log(error);
     res
       .status(500)
-      .json({ message: "Can not change password", success: false });
+      .json({ message: "ไม่สามารถเปลี่ยนรหัสผ่านได้", success: false });
   }
 };
 
@@ -557,7 +557,7 @@ const forgotPasswordController = async (req, res) => {
     .findOne({ email })
     .then((user) => {
       if (!user) {
-        return res.send({ message: "User not existed" });
+        return res.send({ message: "ไม่พบผู้ใช้" });
       }
       const token = jwt.sign({ id: user._id }, "jwt_secret_key", {
         expiresIn: "1d",
@@ -590,7 +590,7 @@ const forgotPasswordController = async (req, res) => {
     })
     .catch((error) => {
       console.log(error);
-      return res.send({ message: "An error occurred" });
+      return res.send({ message: "เกิดข้อผิดพลาด" });
     });
 };
 
@@ -654,14 +654,14 @@ const userEditController = async (req, res) => {
     );
     res.status(200).send({
       success: true,
-      message: "updated success",
+      message: "แก้ไขข้อมูลสำเร็จ",
       data: user,
     });
   } catch (error) {
     console.log(error);
     res.send({
       success: false,
-      message: "Error to updated",
+      message: "แก้ไขข้อมูลไม่สำเร็จ",
     });
   }
 };
@@ -697,7 +697,7 @@ const sendContactController = async (req, res) => {
     return res.send({ success: true });
   } catch (error) {
     console.log(error);
-    return res.send({ message: "An error occurred" });
+    return res.send({ message: "เกิดข้อผิดพลาด" });
   }
 };
 
