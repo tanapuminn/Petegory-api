@@ -533,7 +533,7 @@ const changePasswordController = async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).send({ message: "รหัสผ่านเก่าไม่ถูกต้อง", success: false });
     }
-
+    
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedNewPassword;
     await user.save();
